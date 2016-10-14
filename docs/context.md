@@ -170,3 +170,46 @@ of time during development.
   about their values and types before each render call. This can be extremely
   helpful for checking that shaders are getting valid inputs.
 
+
+
+| blend         | false | GL.BLEND | gl.enable |
+| blendColor    | [] 
+| blendEquation | [GL.FUNC_ADD, GL.FUNC_ADD] | [GL.BLEND_EQUATION_RGB, GL.BLEND_EQUATION_ALPHA] |
+  blendFunc     | [GL.ONE, GL.ZERO, GL.ONE, GL.ZERO] |  |
+
+  colorClearValue: ,
+  colorMask: ,
+  colorWritemask: ,
+
+  cullFace: false,
+  cullFaceMode: ,
+
+  depthTest: false,
+  depthClearValue: ,
+  depthFunc: ,
+  depthRange: ,
+  depthWritemask: ,
+
+  dither: true,
+
+  frontFace: ,
+
+  generateMipmapHint: ,
+
+  lineWidth: ,
+
+  polygonOffsetFill: false,
+  polygonOffset: ,
+
+  sampleCoverage: ,
+
+  scissorTest: false,
+  scissorBox: ,
+
+  stencilTest: false,
+  stencilClearValue: ,
+  stencilMask: ,
+  stencilFunc: ,
+  stencilOp: ,
+
+  viewport:

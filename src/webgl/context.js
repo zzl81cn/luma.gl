@@ -1,14 +1,15 @@
 // WebGLRenderingContext related methods
 /* eslint-disable no-try-catch, no-loop-func */
-import WebGLDebug from 'webgl-debug';
+/* global document */
 import {WebGLRenderingContext, webGLTypesAvailable} from './webgl-types';
-import {assertWebGLContext, isWebGL2Context}
-  from './webgl-checks';
+import GL from './webgl-constants';
+import {assertWebGLContext, isWebGL2Context} from './checks';
 import queryManager from './helpers/query-manager';
 import {log, isBrowser, isPageLoaded, pageLoadPromise} from '../utils';
 import luma from '../globals';
 import assert from 'assert';
-/* global document */
+// Khronos Debug support
+import WebGLDebug from 'webgl-debug';
 
 const GL_UNMASKED_VENDOR_WEBGL = 0x9245;
 const GL_UNMASKED_RENDERER_WEBGL = 0x9246;
@@ -190,6 +191,22 @@ export function glContextWithState(gl, {scissorTest, framebuffer}, func) {
   return value;
 }
 
+export function getGLContextInfo(gl) {
+  const vendorMasked = gl.getParameter(GL.VENDOR);
+  const rendererMasked = gl.getParameter(GL.RENDERER);
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  const vendorUnmasked = info && gl.getParameter(GL_UNMASKED_VENDOR_WEBGL);
+  const rendererUnmasked = info && gl.getParameter(GL_UNMASKED_RENDERER_WEBGL);
+  return {
+    vendor: vendorUnmasked || vendorMasked,
+    renderer: rendererUnmasked || rendererMasked,
+    vendorMasked,
+    rendererMasked,
+    version: gl.getParameter(GL.VERSION),
+    shadingLanguageVersion: gl.getParameter(GL.SHADING_LANGUAGE_VERSION)
+  };
+}
+
 // DEBUG INFO
 
 /**
@@ -199,11 +216,7 @@ export function glContextWithState(gl, {scissorTest, framebuffer}, func) {
  * @return {Object} - 'vendor' and 'renderer' string fields.
  */
 export function glGetDebugInfo(gl) {
-  const info = gl.getExtension('WEBGL_debug_renderer_info');
-  return {
-    vendor: info ? gl.getParameter(GL_UNMASKED_VENDOR_WEBGL) : 'unknown',
-    renderer: info ? gl.getParameter(GL_UNMASKED_RENDERER_WEBGL) : 'unknown'
-  };
+  return getGLContextInfo(gl);
 }
 
 function logInfo(gl) {

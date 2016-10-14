@@ -7,6 +7,8 @@ import {assertWebGLContext, assertDrawMode, assertIndexType}
   from './webgl-checks';
 import assert from 'assert';
 
+const extension = gl.getExtension('ANGLE_instanced_arrays');
+
 // A good thing about webGL is that there are so many ways to draw things,
 // e.g. depending on whether data is indexed and/or isInstanced.
 // This function unifies those into a single call with simple parameters
@@ -31,17 +33,14 @@ export function draw(gl, {
   }
 
   // TODO - Use polyfilled WebGL2RenderingContext instead of ANGLE extension
-  if (isInstanced) {
-    const extension = gl.getExtension('ANGLE_instanced_arrays');
-    if (isIndexed) {
-      extension.drawElementsInstancedANGLE(
-        drawMode, vertexCount, indexType, offset, instanceCount
-      );
-    } else {
-      extension.drawArraysInstancedANGLE(
-        drawMode, offset, vertexCount, instanceCount
-      );
-    }
+  if (isInstanced && isIndexed) {
+    extension.drawElementsInstancedANGLE(
+      drawMode, vertexCount, indexType, offset, instanceCount
+    );
+  } else if (isInstanced) {
+    extension.drawArraysInstancedANGLE(
+      drawMode, offset, vertexCount, instanceCount
+    );
   } else if (isIndexed) {
     gl.drawElements(drawMode, vertexCount, indexType, offset);
   } else {
