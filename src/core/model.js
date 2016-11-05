@@ -3,35 +3,23 @@
 
 // Define some locals
 import {
-  GL, Buffer, Program, draw, checkUniformValues, getUniformsTable,
-  WebGLRenderingContext
+  GL, Buffer, Program, draw, checkUniformValues, getUniformsTable
 } from '../webgl';
+import {isWebGLContext} from '../webgl';
 import Object3D from '../scenegraph/object-3d';
 import {log, formatValue} from '../utils';
-import Geometry from './geometry';
 import assert from 'assert';
 
 const MSG_INSTANCED_PARAM_DEPRECATED = `\
 Warning: Model constructor: parameter "instanced" renamed to "isInstanced".
 This will become a hard error in a future version of luma.gl.`;
 
-const MSG_TEXTURES_PARAM_REMOVED =
-  'Model: parameter "textures" removed. Use uniforms to set textures';
-
-// TODO - experimental, not yet used
-export class Material {
-  constructor({shininess = 0, reflection = 0, refraction = 0} = {}) {
-    this.shininess = shininess;
-    this.reflection = reflection;
-    this.refraction = refraction;
-  }
-}
+const ERR_MODEL_PARAMS = 'Model needs drawMode and vertexCount';
 
 // Model abstract O3D Class
 export default class Model extends Object3D {
-
   constructor(gl, opts = {}) {
-    opts = gl instanceof WebGLRenderingContext ? {...opts, gl} : gl;
+    opts = isWebGLContext(gl) ? {...opts, gl} : gl;
     super(opts);
     this.init(opts);
   }
@@ -43,27 +31,29 @@ export default class Model extends Object3D {
     gl = null,
     vs = null,
     fs = null,
-    geometry,
-    material = null,
-    textures,
+    shaderlibs = {},
+
     // Enables instanced rendering (needs shader support and extra attributes)
+    drawMode,
+    vertexCount = undefined,
     isInstanced = false,
     instanceCount = 0,
-    vertexCount = undefined,
-    // Picking
-    pickable = true,
-    pick = null,
+
     // Extra uniforms and attributes (beyond geometry, material, camera)
     uniforms = {},
     attributes = {},
+    geometry = null,
+
+    // Picking
+    pickable = true,
+    pick = null,
     render = null,
     onBeforeRender = () => {},
     onAfterRender = () => {},
+
+    // Other opts
     ...opts
   } = {}) {
-    // assert(program || program instanceof Program);
-    assert(geometry instanceof Geometry, 'Model needs a geometry');
-
     // set a custom program per o3d
     this.program = program || new Program(gl, {vs, fs});
     assert(this.program instanceof Program, 'Model needs a program');
@@ -75,10 +65,6 @@ export default class Model extends Object3D {
       isInstanced = isInstanced || opts.instanced;
     }
 
-    if (textures) {
-      throw new Error(MSG_TEXTURES_PARAM_REMOVED);
-    }
-
     // TODO - remove?
     this.buffers = {};
     this.userData = {};
@@ -86,10 +72,9 @@ export default class Model extends Object3D {
     this.dynamic = false;
     this.needsRedraw = true;
 
-    this.material = material;
-
     // Attributes and buffers
     this.setGeometry(geometry);
+
     this.attributes = {};
     this.setAttributes(attributes);
 
@@ -99,10 +84,15 @@ export default class Model extends Object3D {
       ...uniforms
     });
 
-    // instanced rendering
+    // geometry might have set drawMode and vertexCount
+    if (drawMode !== undefined) {
+      this.drawMode = drawMode;
+    }
+    if (vertexCount !== undefined) {
+      this.vertexCount = vertexCount;
+    }
     this.isInstanced = isInstanced;
     this.instanceCount = instanceCount;
-    this.vertexCount = vertexCount;
 
     // picking options
     this.pickable = Boolean(pickable);
@@ -110,16 +100,16 @@ export default class Model extends Object3D {
 
     this.onBeforeRender = onBeforeRender;
     this.onAfterRender = onAfterRender;
+
+    // assert(program || program instanceof Program);
+    assert(drawMode !== undefined && Number.isFinite(vertexCount),
+      ERR_MODEL_PARAMS);
   }
   /* eslint-enable max-statements */
   /* eslint-enable complexity */
 
   destroy() {
     // TODO
-  }
-
-  get hash() {
-    return `${this.id} ${this.$pickingIndex}`;
   }
 
   setNeedsRedraw(redraw = true) {
@@ -135,8 +125,27 @@ export default class Model extends Object3D {
     return redraw;
   }
 
+  setDrawMode(drawMode) {
+    this.drawMode = drawMode;
+    return this;
+  }
+
+  getDrawMode() {
+    return this.drawMode;
+  }
+
+  setVertexCount(vertexCount) {
+    assert(Number.isFinite(vertexCount));
+    this.vertexCount = vertexCount;
+    return this;
+  }
+
+  getVertexCount() {
+    return this.vertexCount;
+  }
+
   setInstanceCount(instanceCount) {
-    assert(instanceCount !== undefined);
+    assert(Number.isFinite(instanceCount));
     this.instanceCount = instanceCount;
     return this;
   }
@@ -145,35 +154,15 @@ export default class Model extends Object3D {
     return this.instanceCount;
   }
 
-  setVertexCount(vertexCount) {
-    this.vertexCount = vertexCount;
-    return this;
-  }
-
-  getVertexCount() {
-    return this.vertexCount === undefined ?
-      this.geometry.getVertexCount() : this.vertexCount;
-  }
-
-  isPickable() {
-    return this.pickable;
-  }
-
-  setPickable(pickable = true) {
-    this.pickable = Boolean(pickable);
-    return this;
-  }
-
   getProgram() {
     return this.program;
   }
 
-  getGeometry() {
-    return this.geometry;
-  }
-
+  // TODO - just set attributes, don't hold on to geometry
   setGeometry(geometry) {
     this.geometry = geometry;
+    this.vertexCount = geometry.getVertexCount();
+    this.drawMode = geometry.drawMode;
     this._createBuffersFromAttributeDescriptors(this.geometry.getAttributes());
     this.setNeedsRedraw();
     return this;
@@ -194,6 +183,7 @@ export default class Model extends Object3D {
     return this.uniforms;
   }
 
+  // TODO - should actually set the uniforms
   setUniforms(uniforms = {}) {
     checkUniformValues(uniforms, this.id);
     Object.assign(this.uniforms, uniforms);
@@ -246,9 +236,9 @@ export default class Model extends Object3D {
       log.warn(0, 'Found instanced attributes on non-instanced model');
     }
     const {isIndexed, indexType} = drawParams;
-    const {geometry, isInstanced, instanceCount} = this;
+    const {isInstanced, instanceCount} = this;
     draw(this.program.gl, {
-      drawMode: geometry.drawMode,
+      drawMode: this.getDrawMode(),
       vertexCount: this.getVertexCount(),
       isIndexed,
       indexType,
@@ -412,5 +402,18 @@ export default class Model extends Object3D {
   setTextures(textures = []) {
     throw new Error(
       'model.setTextures replaced: setUniforms({sampler2D: new Texture2D})');
+  }
+
+  isPickable() {
+    return this.pickable;
+  }
+
+  setPickable(pickable = true) {
+    this.pickable = Boolean(pickable);
+    return this;
+  }
+
+  getGeometry() {
+    return this.geometry;
   }
 }

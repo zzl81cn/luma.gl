@@ -10,7 +10,7 @@ const ERR_WEBGL2 = 'Requires WebGL2';
 
 export function isWebGLContext(gl) {
   return gl instanceof WebGLRenderingContext ||
-    (gl && gl.ARRAY_BUFFER === 0x8892);
+    (gl && gl.ARRAY_BUFFER === GL.ARRAY_BUFFER);
 }
 
 export function isWebGL2Context(gl) {
