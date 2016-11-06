@@ -1,5 +1,5 @@
 import {createGLContext} from '../../src/headless';
-import {glGetInfo, ES300, TEST_LIMITS as TEST_LIMITS} from './limits';
+import {glGetInfo, ES300, TEST_LIMITS} from './limits';
 import test from 'tape-catch';
 
 const fixture = {
@@ -8,6 +8,9 @@ const fixture = {
 
 test('WebGL#glGetInfo', t => {
   const {gl} = fixture;
+
+  t.ok(glGetInfo, 'glGetInfo defined');
+  t.ok(ES300, 'ES300 defined');
 
   const info = glGetInfo(gl);
 

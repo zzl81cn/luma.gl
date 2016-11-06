@@ -2,6 +2,12 @@
 import {GL} from '../webgl';
 import assert from 'assert';
 
+const GLenum = 'GLenum';
+const GLfloat = 'GLfloat';
+const GLint = 'GLint';
+const GLuint = 'GLint';
+const GLboolean = 'GLboolean';
+
 /*
 State management
 - camelCased versions of the GL constants
@@ -13,21 +19,21 @@ State management
 // Map of composite parameters
 const GL_STATE = {
   blend: {
-    // GLboolean
+    type: GLboolean,
     value: false,
     params: GL.BLEND,
     setter: (gl, value) => gl.enable(GL.BLEND, value)
   },
 
   blendColor: {
-    // Float32Array (with 4 values)
-    value: [0, 0, 0, 0],
+    type: new Float32Array(4),
+    value: new Float32Array([0, 0, 0, 0]),
     params: GL.BLEND_COLOR,
     setter: (gl, value) => gl.blendColor(value)
   },
 
   blendEquation: {
-    // GLenum, GLenum
+    type: [GLenum, GLenum],
     value: [GL.FUNC_ADD, GL.FUNC_ADD],
     params: [GL.BLEND_EQUATION_RGB, GL.BLEND_EQUATION_ALPHA],
     object: ['rgb', 'alpha'],
@@ -38,6 +44,7 @@ const GL_STATE = {
 
   // blend func
   blendFunc: {
+    type: [GLenum, GLenum, GLenum, GLenum],
     value: [GL.ONE, GL.ZERO, GL.ONE, GL.ZERO],
     params: [
       GL.BLEND_SRC_RGB, GL.BLEND_SRC_ALPHA, GL.BLEND_DST_RGB, GL.BLEND_DST_ALPHA
@@ -49,75 +56,77 @@ const GL_STATE = {
   },
 
   clearColor: {
-    // Float32Array (with 4 values)
+    type: new Float32Array(4),
+    value: new Float32Array([0, 0, 0, 0]), // TBD
     params: GL.COLOR_CLEAR_VALUE,
     setter: (gl, value) => gl.clearColor(...value)
   },
 
   colorMask: {
-    // sequence<GLboolean> (with 4 values)
+    type: [GLboolean, GLboolean, GLboolean, GLboolean],
+    value: [true, true, true, true],
     params: GL.COLOR_WRITEMASK,
     setter: (gl, value) => gl.colorMask(...value)
   },
 
   cullFace: {
-    // GLboolean
+    type: GLboolean,
     value: false,
     params: GL.CULL_FACE,
     setter: (gl, value) => gl.enable(GL.CULL_FACE, value)
   },
 
   cullFaceMode: {
-    // GLenum
+    type: GLenum,
     params: GL.CULL_FACE_MODE,
     setter: (gl, value) => gl.cullFace(value)
   },
 
   depthTest: {
-    // GLboolean
+    type: GLboolean,
     value: false,
     params: GL.DEPTH_TEST,
     setter: (gl, value) => gl.enable(GL.DEPTH_TEST, value)
   },
 
   depthClearValue: {
-    // GLfloat
+    type: GLfloat,
     value: true,
     params: GL.DEPTH_CLEAR_VALUE,
     setter: (gl, value) => gl.clearDepth(value)
   },
 
   depthFunc: {
-    // GLenum
+    type: GLenum,
     value: null,
     params: GL.DEPTH_FUNC,
     setter: (gl, value) => gl.depthFunc(value)
   },
 
   depthRange: {
-    // Float32Array (with 2 elements)
-    value: new Float32Array(null, null),
+    type: new Float32Array(2),
+    value: new Float32Array(null, null), // TBD
     object: ['min', 'max'],
     params: GL.DEPTH_RANGE,
     setter: (gl, value) => gl.depthRange(...value)
   },
 
   depthWritemask: {
-    // GLboolean
+    type: GLboolean,
     value: null,
     params: GL.DEPTH_WRITEMASK,
     setter: (gl, value) => gl.depthMask(value)
   },
 
   dither: {
-    // GLboolean
+    type: GLboolean,
     value: true,
     params: GL.DITHER,
     setter: (gl, value) => gl.enable(GL.DITHER, value)
   },
 
   frontFace: {
-    // GLenum
+    type: GLenum,
     value: GL.CCW,
     params: GL.FRONT_FACE,
     setter: (gl, value) => gl.frontFace(value)
@@ -125,21 +134,21 @@ const GL_STATE = {
 
   // Hint for quality of images generated with glGenerateMipmap
   generateMipmapHint: {
-    // GLenum
+    type: GLenum,
     value: GL.DONT_CARE,
     params: GL.GENERATE_MIPMAP_HINT,
     setter: (gl, value) => gl.hint(GL.GENERATE_MIPMAP_HINT, value)
   },
 
   lineWidth: {
-    // GLfloat
+    type: GLfloat,
     value: 1,
     params: GL.LINE_WIDTH,
     setter: (gl, value) => gl.lineWidth(value)
   },
 
   polygonOffsetFill: {
-    // GLboolean
+    type: GLboolean,
     value: false,
     params: GL.POLYGON_OFFSET_FILL,
     setter: (gl, value) => gl.enable(GL.POLYGON_OFFSET_FILL, value)
@@ -150,7 +159,7 @@ const GL_STATE = {
   // and for rendering solids with highlighted edges.
   // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glPolygonOffset.xml
   polygonOffset: {
-    // GLfloat, GLfloat
+    type: [GLfloat, GLfloat],
     value: [0, 0],
     params: [GL.POLYGON_OFFSET_FACTOR, GL.POLYGON_OFFSET_UNITS],
     object: ['factor', 'units'],
@@ -164,7 +173,7 @@ const GL_STATE = {
   // specify multisample coverage parameters
   // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glSampleCoverage.xml
   sampleCoverage: {
-    // GLfloat GLboolean
+    type: [GLfloat, GLboolean],
     value: [1.0, false],
     params: [GL.SAMPLE_COVERAGE_VALUE, GL.SAMPLE_COVERAGE_INVERT],
     object: ['value', 'invert'],
@@ -172,21 +181,21 @@ const GL_STATE = {
   },
 
   scissorTest: {
-    // GLboolean
+    type: GLboolean,
     value: false,
     params: GL.SCISSOR_TEST,
     setter: (gl, value) => gl.enable(GL.SCISSOR_TEST, value)
   },
   scissorBox: {
-    // Int32Array (with 4 elements)
-    value: new Int32Array([null, null, null, null]),
+    type: new Int32Array(4),
+    value: new Int32Array([null, null, null, null]), // TBD
     object: ['x', 'y', 'width', 'height'],
     params: GL.SCISSOR_BOX,
     setter: (gl, value) => gl.scissor(...value)
   },
 
   stencilTest: {
-    // GLboolean
+    type: GLboolean,
     value: false,
     params: GL.STENCIL_TEST,
     setter: (gl, value) => gl.enable(GL.STENCIL_TEST, value)
@@ -194,7 +203,7 @@ const GL_STATE = {
 
   // Sets index used when stencil buffer is cleared.
   stencilClearValue: {
-    // GLint
+    type: GLint,
     value: 0,
     params: GL.STENCIL_CLEAR_VALUE, // GLint
     setter: (gl, value) => gl.clearStencil(value)
@@ -203,7 +212,7 @@ const GL_STATE = {
   // Sets bit mask enabling writing of individual bits in the stencil planes
   // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glStencilMaskSeparate.xml
   stencilMask: {
-    // GLuint | [GLuint, GLuint]
+    type: [GLuint, GLuint],
     value: [0xFFFFFFFF, 0xFFFFFFFF],
     params: [GL.STENCIL_WRITEMASK, GL.STENCIL_BACK_WRITEMASK],
     object: ['mask', 'backMask'],
@@ -218,7 +227,7 @@ const GL_STATE = {
   // Set stencil testing function, reference value and mask for front and back
   // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glStencilFuncSeparate.xml
   stencilFunc: {
-    // [GLenum, GLint, GLuint] || [GLenum, GLint, GLuint, GLenum, GLint, GLuint]
+    type: [GLenum, GLint, GLuint, GLenum, GLint, GLuint],
     value: [GL.ALWAYS, 0, 0xFFFFFFFF, GL.ALWAYS, 0, 0xFFFFFFFF],
     params: [
       // front
@@ -246,7 +255,7 @@ const GL_STATE = {
   // and GL.INVERT
   // https://www.khronos.org/opengles/sdk/docs/man/xhtml/glStencilOpSeparate.xml
   stencilOp: {
-    // [GLenum, GLenum, GLenum, GLenum, GLenum, GLenum]
+    type: [GLenum, GLenum, GLenum, GLenum, GLenum, GLenum],
     values: [GL.KEEP, GL.KEEP, GL.KEEP, GL.KEEP, GL.KEEP, GL.KEEP],
     params: [
       // front
@@ -270,7 +279,7 @@ const GL_STATE = {
   },
 
   viewport: {
-    // Int32Array (with 4 elements)
+    type: new Int32Array(4),
     value: new Int32Array([]),
     params: GL.VIEWPORT,
     object: ['x', 'y', 'width', 'height'],
@@ -281,31 +290,31 @@ const GL_STATE = {
 
   // Packing of pixel data in memory (1,2,4,8)
   packAlignment: {
-    // {GLint}
+    type: GLint,
     params: GL.PACK_ALIGNMENT,
     setter: (gl, value) => gl.pixelStorei(value)
   },
   // Unpacking pixel data from memory(1,2,4,8)
   unpackAlignment: {
-    // {GLint}
+    type: GLint,
     params: GL.UNPACK_ALIGNMENT,
     setter: (gl, value) => gl.pixelStorei(value)
   },
   // Flip source data along its vertical axis
   unpackFlipY: {
-    // {GLboolean}
+    type: GLboolean,
     params: GL.UNPACK_FLIP_Y_WEBGL,
     setter: (gl, value) => gl.pixelStorei(value)
   },
   // Multiplies the alpha channel into the other color channels
   unpackPremultiplyAlpha: {
-    // {GLboolean}
+    type: GLboolean,
     params: GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL,
     setter: (gl, value) => gl.pixelStorei(value)
   },
   // Default color space conversion or no color space conversion.
   unpackColorspaceConversion: {
-    // {GLenum}
+    type: GLenum,
     params: GL.UNPACK_COLORSPACE_CONVERSION_WEBGL,
     setter: (gl, value) => gl.pixelStorei(value)
   },
@@ -314,44 +323,52 @@ const GL_STATE = {
 
   // Number of pixels in a row.
   packRowLength: {
-    // GLint
+    type: GLint,
     params: GL.PACK_ROW_LENGTH,
-    setter: (gl, value) => gl.pixelStorei(value)
+    setter: (gl, value) => gl.pixelStorei(value),
+    webgl2: true
   },
   //  Number of pixels skipped before the first pixel is written into memory.
   packSkipPixels: {
     params: GL.PACK_SKIP_PIXELS,
-    setter: (gl, value) => gl.pixelStorei(value)
+    setter: (gl, value) => gl.pixelStorei(value),
+    webgl2: true
   },
   //  Number of rows of pixels skipped before first pixel is written to memory.
   packSkipRows: {
     params: GL.PACK_SKIP_ROWS,
-    setter: (gl, value) => gl.pixelStorei(value)
+    setter: (gl, value) => gl.pixelStorei(value),
+    webgl2: true
   },
   //  Number of pixels in a row.
   unpackRowLength: {
     params: GL.UNPACK_ROW_LENGTH,
-    setter: (gl, value) => gl.pixelStorei(value)
+    setter: (gl, value) => gl.pixelStorei(value),
+    webgl2: true
   },
   //  Image height used for reading pixel data from memory
   unpackImageHeight: {
     params: GL.UNPACK_IMAGE_HEIGHT,
-    setter: (gl, value) => gl.pixelStorei(value)
+    setter: (gl, value) => gl.pixelStorei(value),
+    webgl2: true
   },
   //  Number of pixel images skipped before first pixel is read from memory
   unpackSkipPixels: {
     params: GL.UNPACK_SKIP_PIXELS,
-    setter: (gl, value) => gl.pixelStorei(value)
+    setter: (gl, value) => gl.pixelStorei(value),
+    webgl2: true
   },
   //  Number of rows of pixels skipped before first pixel is read from memory
   unpackSkipRows: {
     params: GL.UNPACK_SKIP_ROWS,
-    setter: (gl, value) => gl.pixelStorei(value)
+    setter: (gl, value) => gl.pixelStorei(value),
+    webgl2: true
   },
   //  Number of pixel images skipped before first pixel is read from memory
   unpackSkipImages: {
     params: GL.UNPACK_SKIP_IMAGES,
-    setter: (gl, value) => gl.pixelStorei(value)
+    setter: (gl, value) => gl.pixelStorei(value),
+    webgl2: true
   }
 };
 
@@ -383,7 +400,7 @@ unpackStateParams();
  * @param {*} value - parameter value
  * @return {*} - "normalized" parameter value after assignment
  */
-export function getValueFromContext(gl, key) {
+export function getGLParameter(gl, key) {
   const parameterDefinition = GL_STATE[key];
   if (!parameterDefinition) {
     throw new Error(`Unknown GL state parameter ${key}`);
@@ -406,7 +423,7 @@ export function getValueFromContext(gl, key) {
  * @param {*} value - parameter value
  * @return {*} - "normalized" parameter value after assignment
  */
-export function setValueToContext(gl, key, value) {
+export function setGLParameter(gl, key, value) {
   const parameterDefinition = GL_STATE[key];
   if (!parameterDefinition) {
     throw new Error(`Unknown GL state parameter ${key}`);
@@ -427,7 +444,7 @@ function isArray(array) {
 
 class GLState {
   // Note: does not maintain a gl reference
-  constructor(gl, {copyState = false}) {
+  constructor(gl, {copyState = false} = {}) {
     this.state = {};
     if (copyState) {
       this._copyWebGLState(gl);
@@ -443,9 +460,7 @@ class GLState {
       // Get current value being shadowed
       oldValues[key] = this.state[key];
       // Set the new value
-      const value = values[key];
-      const actualValue = setValueToContext(gl, key, value);
-      this.state[key] = actualValue;
+      this.setValue(gl, key, values[key]);
     }
     this.overrides.push({oldValues});
   }
@@ -454,7 +469,7 @@ class GLState {
     assert(this.overrides.length > 0);
     const {oldValues} = this.overrides.pop();
     for (const key in oldValues) {
-      // Set the new value
+      // Set the old value
       this.setValue(gl, key, oldValues[key]);
     }
   }
@@ -463,12 +478,17 @@ class GLState {
     return this.state[key];
   }
 
+  setValue(gl, key, value) {
+    const actualValue = setGLParameter(gl, key, value);
+    this.state[key] = actualValue;
+  }
+
   // Copies entire WebGL state to an object.
   // This generates a huge amount of asynchronous requests and should be
   // considered a very slow operation, to be done once at program startup.
   _copyWebGLState(gl) {
     for (const parameterKey in GL_STATE) {
-      this.state[parameterKey] = this.queryValue(gl, parameterKey);
+      this.state[parameterKey] = getGLParameter(gl, parameterKey);
     }
   }
 
@@ -479,18 +499,9 @@ class GLState {
   }
 }
 
-// const glStateWeakMap = new WeakMap();
-// function getContextState(gl, {copyState = false}) {
-  // const glState = glStateWeakMap.get(gl, {copyState});
-  // if (!glState) {
-  //   glState = new GLState(gl);
-  //   glStateWeakMap.insert(gl, glState);
-  // }
-// }
-
-function getContextState(gl, {copyState = false}) {
+function getGLState(gl, {copyState = false} = {}) {
   gl.luma = gl.luma || {};
-  gl.luma.state = gl.luma.state || new GLState(gl);
+  gl.luma.state = gl.luma.state || new GLState(gl, {copyState});
   return gl.luma.state;
 }
 
@@ -500,7 +511,7 @@ function getContextState(gl, {copyState = false}) {
  */
 export function withGLState(gl, {frameBuffer, ...params}, func) {
   // assertWebGLContext(gl);
-  const state = getContextState(gl);
+  const state = getGLState(gl);
 
   // TODO - was there any previously set frame buffer we need to remember?
   if (frameBuffer) {
@@ -522,5 +533,6 @@ export function withGLState(gl, {frameBuffer, ...params}, func) {
   }
 }
 
-export const TEST_STATE = GL_STATE;
-
+export const TEST_EXPORTS = {
+  GL_STATE
+};
