@@ -2,8 +2,8 @@
 /* eslint-disable no-try-catch, no-loop-func */
 /* global document */
 import {WebGLRenderingContext, webGLTypesAvailable} from './webgl-types';
-import GL from './webgl-constants';
-import {assertWebGLContext, isWebGL2Context} from './checks';
+import GL from './constants';
+import {assertWebGLContext, isWebGL2Context} from './webgl-checks';
 import queryManager from './helpers/query-manager';
 import {log, isBrowser, isPageLoaded, pageLoadPromise} from '../utils';
 import luma from '../globals';

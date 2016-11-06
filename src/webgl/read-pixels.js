@@ -1,4 +1,4 @@
-import {GL} from './webgl-constants';
+import {GL} from './constants';
 import {assertWebGL2RenderingContext} from 'webgl-checks';
 
 /**

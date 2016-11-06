@@ -1,4 +1,9 @@
-import test from '../setup';
+/*
+// decorate tape-catch with tape-promise
+import test_ from 'tape-catch';
+import tapePromise from 'tape-promise';
+const test = tapePromise(test_);
+
 import {promisify, compressImage, loadImage} from '../../src';
 import fs from 'fs';
 import path from 'path';
@@ -18,7 +23,7 @@ const IMAGE = {
 };
 
 // Test that we can write and read an image, and that result is identical
-test('io#write-read-image', async function(t) {
+async function tc(t) {
   await promisify(mkdirp)(TEST_DIR);
   const file = fs.createWriteStream(TEST_FILE);
   file.on('close', async function() {
@@ -27,4 +32,7 @@ test('io#write-read-image', async function(t) {
     t.end();
   });
   compressImage(IMAGE).pipe(file);
-});
+}
+
+test('io#write-read-image', tc);
+*/

@@ -1,6 +1,6 @@
 /* eslint-disable no-inline-comments, max-len */
-import GL from '../webgl/webgl-types';
-import {isWebGL2Context} from '../webgl/checks';
+import GL from '../webgl/constants';
+import {isWebGL2Context} from '../webgl/webgl-checks';
 import assert from 'assert';
 
 const WEBGL1_LIMITS = {
@@ -16,7 +16,7 @@ const WEBGL1_LIMITS = {
   [GL.MAX_VERTEX_ATTRIBS]: {webgl1: 8}, // GLint
   [GL.MAX_VERTEX_UNIFORM_VECTORS]: {webgl1: 128}, // GLint
   [GL.MAX_FRAGMENT_UNIFORM_VECTORS]: {webgl1: 16}, // GLint
-  [GL.MAX_VIEWPORT_DIMS]: {webgl1: Int32Array([0, 0])}
+  [GL.MAX_VIEWPORT_DIMS]: {webgl1: new Int32Array([0, 0])}
 };
 
 const WEBGL2_LIMITS = {
@@ -224,9 +224,9 @@ export function getGLContextLimits(gl) {
         WEBGL2_LIMITS[limit].webgl1;
       gl.luma.limits[limit] = {
         value,
-        webgl1: WEBGL1_LIMITS[limit].webgl1,
-        webgl2: WEBGL1_LIMITS[limit].webgl2 || WEBGL1_LIMITS[limit].webgl1,
-        common: WEBGL1_LIMITS[limit].common || WEBGL1_LIMITS[limit].webgl1
+        webgl1: WEBGL2_LIMITS[limit].webgl1,
+        webgl2: WEBGL2_LIMITS[limit].webgl2 || WEBGL2_LIMITS[limit].webgl1,
+        common: WEBGL2_LIMITS[limit].common || WEBGL2_LIMITS[limit].webgl1
       };
     }
   }
@@ -241,14 +241,14 @@ export function getGLContextCaps(gl) {
     const webglVersion = isWebGL2Context(gl) ? 'webgl2' : 'webgl1';
     gl.luma.caps = {};
     for (const cap in WEBGL_CAPS) {
-      gl.luma.caps[cap] = getCap({cap, webglVersion});
+      gl.luma.caps[cap] = getCap({gl, cap, webglVersion});
     }
 
   }
   return gl.luma.caps;
 }
 
-function getCap({cap, webglVersion}) {
+function getCap({gl, cap, webglVersion}) {
 
   // Get extension name, and replace if webgl2 uses the webgl1 extension
   let extensionName = WEBGL_CAPS[cap][webglVersion];
@@ -263,6 +263,21 @@ function getCap({cap, webglVersion}) {
   }
   assert(value === false || value === true || value === ES300);
   return value;
+}
+
+export function glGetInfo(gl) {
+  const info = getGLContextInfo(gl);
+  return {
+    // basic information
+    vendor: info[GL.UNMASKED_VENDOR_WEBGL] || info[GL.VENDOR],
+    renderer: info[GL.UNMASKED_RENDERER_WEBGL] || info[GL.RENDERER],
+    version: info[GL.VERSION],
+    shadingLanguageVersion: info[GL.SHADING_LANGUAGE_VERSION],
+    // info, caps and limits
+    info,
+    caps: getGLContextCaps(gl),
+    limits: getGLContextLimits(gl)
+  };
 }
 
 export const TEST_LIMITS = {

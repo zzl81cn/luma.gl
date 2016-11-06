@@ -1,7 +1,7 @@
 import {
   createGLContext, Program,
   loadFiles, loadTextures
-} from '../../without-io';
+} from '..//without-io';
 import test from 'tape-catch';
 
 test('LumaGL#imports are defined', t => {

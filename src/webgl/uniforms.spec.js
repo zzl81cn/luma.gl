@@ -1,7 +1,6 @@
-/* eslint-disable no-inline-comments */
+/* eslint-disable no-inline-comments, no-unused-vars */
 import {
-  createGLContext, Program, Buffer, Texture, Texture2D, TextureCube,
-  checkUniformValues
+  createGLContext, Program, Texture2D, checkUniformValues
 } from '../../src/headless';
 
 import test from 'tape-catch';

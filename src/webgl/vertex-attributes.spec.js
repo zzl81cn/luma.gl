@@ -26,7 +26,7 @@ test('WebGL#VertexAttributes#enable', t => {
     VertexAttributes.disable(gl, i);
   }
 
-  t.equal(VertexAttributes.isEnabled(gl, 0), true, `vertex attribute 0 should **NOT** be disabled`);
+  t.equal(VertexAttributes.isEnabled(gl, 0), true, 'vertex attribute 0 should **NOT** be disabled');
   for (let i = 1; i < MAX_ATTRIBUTES; i++) {
     t.equal(VertexAttributes.isEnabled(gl, i), false, `vertex attribute ${i} should now be disabled`);
   }

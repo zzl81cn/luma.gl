@@ -283,31 +283,31 @@ const GL_STATE = {
   packAlignment: {
     // {GLint}
     params: GL.PACK_ALIGNMENT,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   // Unpacking pixel data from memory(1,2,4,8)
   unpackAlignment: {
     // {GLint}
     params: GL.UNPACK_ALIGNMENT,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   // Flip source data along its vertical axis
   unpackFlipY: {
     // {GLboolean}
     params: GL.UNPACK_FLIP_Y_WEBGL,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   // Multiplies the alpha channel into the other color channels
   unpackPremultiplyAlpha: {
     // {GLboolean}
     params: GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   // Default color space conversion or no color space conversion.
   unpackColorspaceConversion: {
     // {GLenum}
     params: GL.UNPACK_COLORSPACE_CONVERSION_WEBGL,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
 
   // WEBGL2 PIXEL PACK/UNPACK MODES
@@ -316,42 +316,42 @@ const GL_STATE = {
   packRowLength: {
     // GLint
     params: GL.PACK_ROW_LENGTH,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   //  Number of pixels skipped before the first pixel is written into memory.
   packSkipPixels: {
     params: GL.PACK_SKIP_PIXELS,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   //  Number of rows of pixels skipped before first pixel is written to memory.
   packSkipRows: {
     params: GL.PACK_SKIP_ROWS,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   //  Number of pixels in a row.
   unpackRowLength: {
     params: GL.UNPACK_ROW_LENGTH,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   //  Image height used for reading pixel data from memory
   unpackImageHeight: {
     params: GL.UNPACK_IMAGE_HEIGHT,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   //  Number of pixel images skipped before first pixel is read from memory
   unpackSkipPixels: {
     params: GL.UNPACK_SKIP_PIXELS,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   //  Number of rows of pixels skipped before first pixel is read from memory
   unpackSkipRows: {
     params: GL.UNPACK_SKIP_ROWS,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   },
   //  Number of pixel images skipped before first pixel is read from memory
   unpackSkipImages: {
     params: GL.UNPACK_SKIP_IMAGES,
-    setter: 'pixelStorei'
+    setter: (gl, value) => gl.pixelStorei(value)
   }
 };
 
@@ -388,9 +388,8 @@ export function getValueFromContext(gl, key) {
   if (!parameterDefinition) {
     throw new Error(`Unknown GL state parameter ${key}`);
   }
-
   // Get the parameter value(s) from the context
-  const {params, getter} = parameterDefinition;
+  const {params} = parameterDefinition;
   const value = isArray(params) ?
     params.map(param => gl.getParameter(param)) :
     gl.getParameter(params);
@@ -412,7 +411,6 @@ export function setValueToContext(gl, key, value) {
   if (!parameterDefinition) {
     throw new Error(`Unknown GL state parameter ${key}`);
   }
-
   const {setter, normalizeValue} = parameterDefinition;
   const adjustedValue = normalizeValue ? normalizeValue(value) : value;
   setter(gl, adjustedValue);
@@ -420,9 +418,6 @@ export function setValueToContext(gl, key, value) {
 }
 
 // HELPERS
-
-/* eslint-disable complexity, max-statements */
-// Return the current values for keys in values
 
 function isArray(array) {
   return Array.isArray(array) || ArrayBuffer.isView(array);
@@ -433,6 +428,7 @@ function isArray(array) {
 class GLState {
   // Note: does not maintain a gl reference
   constructor(gl, {copyState = false}) {
+    this.state = {};
     if (copyState) {
       this._copyWebGLState(gl);
     } else {
@@ -448,8 +444,8 @@ class GLState {
       oldValues[key] = this.state[key];
       // Set the new value
       const value = values[key];
-      const actualValue = setValue(gl, key, value);
-      this.state[key] = value;
+      const actualValue = setValueToContext(gl, key, value);
+      this.state[key] = actualValue;
     }
     this.overrides.push({oldValues});
   }
@@ -457,7 +453,7 @@ class GLState {
   popValues(gl) {
     assert(this.overrides.length > 0);
     const {oldValues} = this.overrides.pop();
-    for (const key in values) {
+    for (const key in oldValues) {
       // Set the new value
       this.setValue(gl, key, oldValues[key]);
     }
@@ -467,15 +463,10 @@ class GLState {
     return this.state[key];
   }
 
-  queryValue(gl, key) {
-    return this.state[key];
-  }
-
   // Copies entire WebGL state to an object.
   // This generates a huge amount of asynchronous requests and should be
   // considered a very slow operation, to be done once at program startup.
   _copyWebGLState(gl) {
-    const state = {};
     for (const parameterKey in GL_STATE) {
       this.state[parameterKey] = this.queryValue(gl, parameterKey);
     }
@@ -503,31 +494,33 @@ function getContextState(gl, {copyState = false}) {
   return gl.luma.state;
 }
 
-
 /*
  * Executes a function with gl states temporarily set
  * Exception safe
  */
-export function withGLState(gl, params, func) {
-  // assertWebGLRenderingContext(gl);
+export function withGLState(gl, {frameBuffer, ...params}, func) {
+  // assertWebGLContext(gl);
+  const state = getContextState(gl);
 
-  if (params.frameBuffer) {
-    // TODO - was there any previously set frame buffer we need to remember?
+  // TODO - was there any previously set frame buffer we need to remember?
+  if (frameBuffer) {
     frameBuffer.bind();
   }
 
-  pushGLState(gl, params);
+  state.pushValues(gl, params);
 
   try {
     func(gl);
   } finally {
-    popGLState(gl);
+    state.popValues(gl);
 
-    if (frameBuffer) {
+    if (params.frameBuffer) {
       // TODO - was there any previously set frame buffer?
       // TODO - delegate "unbind" to Framebuffer object?
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
   }
 }
+
+export const TEST_STATE = GL_STATE;
 

@@ -4,6 +4,5 @@
   	"glslify",
   	"transform-decorators-legacy",
     ["transform-builtin-extend", {"globals": ["Array"]}]
-  ],
-  "compact": "false"
+  ]
 }

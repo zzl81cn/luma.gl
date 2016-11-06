@@ -1,7 +1,4 @@
 require('babel-polyfill');
 
-require('./webgl-independent');
-require('./webgl');
-
-// deprecated
-require('../src/deprecated/test');
+require('./webgl-independent-index');
+require('./webgl-index');

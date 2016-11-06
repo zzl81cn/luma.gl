@@ -30,9 +30,7 @@ test('WebGL#Buffer constructor/delete', t => {
 test('WebGL#Buffer bind/unbind', t => {
   const {gl} = fixture;
 
-  let buffer;
-
-  buffer = new Buffer(gl)
+  const buffer = new Buffer(gl)
     .bind()
     .unbind()
     .delete();

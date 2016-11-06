@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import cookie from 'cookie-cutter';
 import {IS_NODE, logger, timestamp} from './env';
-import d3 from 'd3-format';
+import * as d3 from 'd3-format';
 
 const formatSI = d3.format('.3s');
 

@@ -14,6 +14,8 @@ test('WebGL#glGetInfo', t => {
   t.ok('limits' in info, 'info has limits');
   t.ok('caps' in info, 'info has caps');
   t.ok('info' in info, 'info has info');
+
+  t.end();
 });
 
 test('glGetInfo#limits', t => {
@@ -34,9 +36,11 @@ test('glGetInfo#limits', t => {
     t.ok(info.limits[limit].webgl2 >= info.limits[limit].webgl1,
       `${limit}: webgl2 limit larger than or equal to webgl1 limit`);
   }
+
+  t.end();
 });
 
-test('glGetInfo#limits', t => {
+test('glGetInfo#caps', t => {
   const {gl} = fixture;
 
   const info = glGetInfo(gl);
@@ -46,4 +50,6 @@ test('glGetInfo#limits', t => {
     t.ok(value === false || value === true || value === ES300,
       `${cap}: cap has one of three allowed values`);
   }
+
+  t.end();
 });

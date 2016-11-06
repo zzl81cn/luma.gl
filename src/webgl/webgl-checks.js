@@ -1,7 +1,7 @@
 // Helper definitions for validation of webgl parameters
 /* eslint-disable no-inline-comments, max-len */
 import {WebGLRenderingContext, WebGL2RenderingContext} from './webgl-types';
-import GL, {glKey} from './webgl-constants';
+import GL, {glKey} from './constants';
 import {glTypeFromArray} from './webgl-arrays';
 import assert from 'assert';
 

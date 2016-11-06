@@ -1,4 +1,4 @@
-import {loadFiles, loadTextures} from '../../';
+import {loadFiles, loadTextures} from '../';
 import test from 'tape-catch';
 
 test('LumaGL#io imports are defined', t => {

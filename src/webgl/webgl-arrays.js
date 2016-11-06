@@ -1,4 +1,4 @@
-import GL from './webgl-constants';
+import GL from './constants';
 
 // TYPED ARRAYS
 
