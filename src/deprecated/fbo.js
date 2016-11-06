@@ -1,5 +1,4 @@
-import {GL} from '../webgl/webgl';
-import {assertWebGLContext} from '../webgl/webgl-checks';
+import GL, {assertWebGLContext} from '../webgl/api';
 import Framebuffer from '../webgl/framebuffer';
 import Renderbuffer from '../webgl/renderbuffer';
 import Texture2D from '../webgl/texture-2d';

@@ -1,9 +1,8 @@
 // WebGLRenderingContext related methods
 /* eslint-disable no-try-catch, no-loop-func */
 /* global document */
-import {WebGLRenderingContext, webGLTypesAvailable} from './webgl-types';
-import GL from './constants';
-import {assertWebGLContext, isWebGL2Context} from './webgl-checks';
+import GL, {WebGLRenderingContext, webGLTypesAvailable} from './api';
+import {assertWebGLContext, isWebGL2Context} from './api';
 import queryManager from './helpers/query-manager';
 import {log, isBrowser, isPageLoaded, pageLoadPromise} from '../utils';
 import luma from '../globals';

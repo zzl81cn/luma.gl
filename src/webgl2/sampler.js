@@ -1,7 +1,7 @@
 // WebGL2 Sampler Helper
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGLQuery
 
-import {assertWebGL2Context, glCheckError} from '../webgl-checks';
+import {assertWebGL2Context, glCheckError} from '../webgl/api';
 
 export default class Sampler {
 

@@ -1,7 +1,5 @@
-import {GL, WebGLBuffer, glTypeFromArray}
-  from './webgl';
-import {assertWebGLContext, assertWebGL2Context,
-  assertArrayTypeMatch} from './webgl-checks';
+import GL, {WebGLBuffer, glTypeFromArray} from './api';
+import {assertWebGLContext, assertWebGL2Context} from './api/checks';
 import assert from 'assert';
 
 export class BufferLayout {
@@ -139,7 +137,7 @@ export default class Buffer {
     type = type || glTypeFromArray(data);
 
     if (data) {
-      assertArrayTypeMatch(data, type, 'in Buffer.setData');
+      assert(glTypeFromArray(data), type, 'in Buffer.setData');
     }
 
     this.bytes = bytes;

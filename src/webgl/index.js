@@ -3,7 +3,7 @@
 // These classes are intentionally close to the WebGL API
 // but make it easier to use.
 // Higher level abstractions can be built on these classes
-export * from './webgl';
+export * from './api';
 
 // WebGL1 objects
 export {default as Buffer} from './buffer';

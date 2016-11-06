@@ -1,6 +1,6 @@
 /* eslint-disable no-inline-comments, max-len */
-import GL from '../webgl/constants';
-import {isWebGL2Context} from '../webgl/webgl-checks';
+import GL from '../webgl/api';
+import {isWebGL2Context} from '../webgl/api';
 import assert from 'assert';
 
 const WEBGL1_LIMITS = {

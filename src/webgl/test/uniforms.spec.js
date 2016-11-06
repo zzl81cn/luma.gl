@@ -1,7 +1,5 @@
 /* eslint-disable no-inline-comments, no-unused-vars */
-import {
-  createGLContext, Program, Texture2D, checkUniformValues
-} from '../../src/headless';
+import {createGLContext, Program, Texture2D, checkUniformValues} from '../';
 
 import test from 'tape-catch';
 

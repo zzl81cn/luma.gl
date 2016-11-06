@@ -1,5 +1,5 @@
-import {GL} from './webgl';
-import {assertWebGLContext} from './webgl-checks';
+import {GL} from './api';
+import {assertWebGLContext} from './api';
 import Texture from './texture';
 import Buffer from './buffer';
 // TODO - looks like circular include?

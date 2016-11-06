@@ -1,7 +1,6 @@
 // WebGL2 Query Helper
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGLQuery
-import {GL} from '../webgl';
-import {isWebGL2Context, assertWebGLContext} from '../webgl/webgl-checks';
+import GL, {assertWebGLContext, isWebGL2Context} from '../webgl/api';
 import queryManager from '../webgl/helpers/query-manager';
 
 // WebGL2 VertexArray Objects Helper

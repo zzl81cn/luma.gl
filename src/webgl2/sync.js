@@ -1,6 +1,6 @@
 // WebGL2 Sync Object Helper
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGLQuery
-import {assertWebGL2Context, glCheckError} from '../webgl/webgl-checks';
+import {assertWebGL2Context, glCheckError} from '../webgl/api';
 import queryManager from './queryManager';
 
 // WebGLSync? fenceSync(GLenum condition, GLbitfield flags);

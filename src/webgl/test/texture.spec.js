@@ -1,5 +1,5 @@
+import {createGLContext, Texture2D} from '../';
 import test from 'tape-catch';
-import {createGLContext, Texture2D} from '../../src/headless';
 
 const fixture = {
   gl: createGLContext()

@@ -1,9 +1,9 @@
-import {GL, glGet, glTypeToArray, glTypeFromArray} from './webgl';
-import {assertWebGLContext, assertWebGL2} from './webgl-checks';
+import {GL, glGet, glTypeToArray, glTypeFromArray} from './api';
+import {assertWebGLContext, assertWebGL2} from './api';
 import Texture2D from './texture-2d';
 import Renderbuffer from './renderbuffer';
-import assert from 'assert';
 import {uid, log} from '../utils';
+import assert from 'assert';
 
 // Returns number of components in a specific WebGL format
 function glFormatToComponents(format) {

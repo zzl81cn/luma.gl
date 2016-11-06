@@ -1,5 +1,5 @@
-import {GL} from './webgl';
-import {assertWebGLContext, assertWebGL2Context} from './webgl-checks';
+import {GL} from './api';
+import {assertWebGLContext, assertWebGL2Context} from './api';
 import * as VertexAttributes from './vertex-attributes';
 import Buffer from './buffer';
 import Texture from './texture';

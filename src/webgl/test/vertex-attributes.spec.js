@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
-import {createGLContext, VertexAttributes} from '../../src/headless';
-import {WebGL2RenderingContext} from '../../src/webgl/webgl-types';
+import {createGLContext, VertexAttributes} from '..';
+import {WebGL2RenderingContext} from '../api';
 
 import test from 'tape-catch';
 

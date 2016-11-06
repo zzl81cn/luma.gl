@@ -1,5 +1,5 @@
-const {createGLContext} = require('../../src/headless');
-const {isWebGLContext} = require('../../src/webgl/webgl-checks');
+const {createGLContext} = require('../');
+const {isWebGLContext} = require('../api');
 
 const test = require('tape-catch');
 

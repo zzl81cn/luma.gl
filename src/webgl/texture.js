@@ -1,6 +1,5 @@
-import {GL, WebGL2RenderingContext, WebGLBuffer, glTypeFromArray}
-  from './webgl';
-import {assertWebGLContext} from './webgl-checks';
+import GL, {WebGL2RenderingContext, WebGLBuffer, glTypeFromArray} from './api';
+import {assertWebGLContext} from './api';
 import Buffer from './buffer';
 import {uid} from '../utils';
 import assert from 'assert';

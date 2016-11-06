@@ -1,6 +1,5 @@
 // WebGL2 VertexArray Objects Helper
-import {WebGL2RenderingContext} from '../webgl/webgl-types';
-import {assertWebGLContext} from '../webgl/webgl-checks';
+import {WebGL2RenderingContext, assertWebGLContext} from '../webgl/api';
 import assert from 'assert';
 
 /* eslint-disable camelcase */

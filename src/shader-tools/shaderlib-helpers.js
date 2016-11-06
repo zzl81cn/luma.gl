@@ -1,3 +1,5 @@
+// Deprecated support for default shaders
+
 /* eslint-disable no-var */
 
 // Default Shaders

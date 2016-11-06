@@ -1,7 +1,7 @@
 /* global window, setTimeout, clearTimeout */
 import autobind from 'autobind-decorator';
 import {isBrowser, pageLoadPromise} from '../utils';
-import {isWebGLContext} from '../webgl/webgl-checks';
+import {isWebGLContext} from '../webgl/api';
 
 // Node.js polyfills for requestAnimationFrame and cancelAnimationFrame
 export const requestAnimationFrame = callback =>

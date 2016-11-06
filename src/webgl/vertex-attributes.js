@@ -1,7 +1,6 @@
 /* eslint-disable dot-notation*/
-import {glGet} from './webgl';
-import {assertWebGLContext, assertWebGL2Context, isWebGL2Context}
-  from './webgl-checks';
+import {glGet} from './api';
+import {assertWebGLContext, assertWebGL2Context, isWebGL2Context} from './api';
 import Buffer from './buffer';
 import {log} from '../utils';
 import assert from 'assert';

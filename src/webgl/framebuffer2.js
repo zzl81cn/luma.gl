@@ -1,6 +1,7 @@
 /* eslint-disable */
-import {GL, glGet, glArrayFromType, glTypeFromArray} from './webgl-types';
-import {assertWebGLContext, assertWebGL2Context} from './webgl-checks';
+import GL, {glGet, glArrayFromType, glTypeFromArray} from './api';
+import {assertWebGLContext, assertWebGL2Context} from './api';
+
 import {Texture2D} from './texture';
 import Renderbuffer from './renderbuffer';
 
@@ -49,7 +50,6 @@ export default class Framebuffer {
 
   constructor(gl) {
     assertWebGLContext(gl);
-
     this.gl = gl;
     this.handle = gl.createFramebuffer();
     if (!this.handle) {

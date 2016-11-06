@@ -1,5 +1,5 @@
-import {createGLContext, Buffer} from '../../src/headless';
-import {isWebGLContext} from '../../src/webgl/webgl-checks';
+import {createGLContext, Buffer} from '../';
+import {isWebGLContext} from '../api';
 import test from 'tape-catch';
 
 const fixture = {

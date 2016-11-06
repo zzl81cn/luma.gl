@@ -1,5 +1,5 @@
-import GL, {glGet} from './webgl';
-import {assertWebGLContext, assertWebGL2Context} from './webgl-checks';
+import GL, {glGet} from './api';
+import {assertWebGLContext, assertWebGL2Context} from './api';
 
 import assert from 'assert';
 

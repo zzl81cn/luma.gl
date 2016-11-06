@@ -1,4 +1,4 @@
-import './helpers/query-manager.spec';
+import '../helpers/query-manager.spec';
 
 // webgl
 import './context.spec';
