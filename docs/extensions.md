@@ -10,30 +10,28 @@ codebases that want to support both WebGL1 and WebGL2.
 
 # Capabilities
 
-Working with WebGL can be challenging due to many features being provided
-either as optional extensions. Checking for the presence of these extensions
-would not be so bad, but is complicated by the fact that WebGL2 is not
-allowed to provide extensions for built-in functionality.
+luma.gl's capability queries let you focus on whether a capability is
+present and not worry about whether you are running WebGL1 or WebGL2 etc
+or what WebGL extensions are involved.
 
-luma.gl's capability queries let's you focus on whether a capability is
-present and not worry about whether you are running WebGL1 or WebGL2 etc.
+Working with WebGL can be challenging due to many important features being
+provided as optional extensions. In addition, WebGL2 is not allowed to
+provide WebGL1 extensions for built-in functionality, so applications also
+need to check if context is WebGL1 or WebGL2 based to conclusively determine
+if a capability is supported or not.
 
 Example:
 ```
-const caps = getGLContextCaps(gl);
-if (caps.TEXTURE_FLOAT) {
-  // true if gl is a WebGL2 context, or OES_TEXTURE_FLOAT extension is available
+const caps = getGLInfo(gl);
+
+// true if gl is a WebGL2 context, or OES_TEXTURE_FLOAT extension is available
+if (info.caps.TEXTURE_FLOAT) {
   const texture = new Texture2D({width, height, type: GL.FLOAT});
   ...
 }
 ```
 
-## General Capabilities
-
-| Extension | Enables | luma.gl support |
-| --- | --- | --- |
-| [WEBGL_shared_resources](https://www.khronos.org/registry/webgl/WEBGL_shared_resources/) | Share resource between WebGL contexts | TBD |
-| [WEBGL_security_sensitive_resources](https://www.khronos.org/registry/webgl/WEBGL_security_sensitive_resources/) | Cross-origin resource loading | TBD |
+## General/Debug Capabilities
 
 ## Debug Capabilities
 
@@ -43,6 +41,8 @@ if (caps.TEXTURE_FLOAT) {
 | DEBUG_SHADERS        | WEBGL_debug_shaders | | TBD |
 | DISJOINT_TIMER_QUERY | EXT_disjoint_timer_query, EXT_disjoint_timer_query_webgl2 | Enables async queries of GPU timings | Luma offers Query objects with queryTime under WebGL1 and WebGL2 |
 | LOSE_CONTEXT         | [WEBGL_lose_context](https://www.khronos.org/registry/webgl/extensions/WEBGL_lose_context/) | Simulate context loss | TBD |
+| -                    | [WEBGL_shared_resources](https://www.khronos.org/registry/webgl/WEBGL_shared_resources/) | Share resource between WebGL contexts | TBD |
+|                      | [WEBGL_security_sensitive_resources](https://www.khronos.org/registry/webgl/WEBGL_security_sensitive_resources/) | Cross-origin resource loading | TBD |
 
 Remarks:
 * luma.gl uses the debug extensions under the hood (when available) to provide
@@ -76,7 +76,6 @@ functionality they enable is provided by default in WebGL2
 | SHADER_TEXTURE_LOD  | EXT_shader_texture_lod  | enables shader control of LOD | |
 | FBO_RENDER_MIPMAP   | OES_fbo_render_mipmap   | Render to specific texture mipmap level | |
 | SRGB                | EXT_sRGB                | sRGB encoded rendering | |
-
 
 ## WebGL2 Extensions
 
@@ -155,4 +154,15 @@ basic categories:
 Also note that because luma.gl gives the application direct access to the WebGL
 context, the application can always work directly with any extensions it needs.
 Using the support that luma.gl provides for a specific extension is optional.
+
+# Limits
+
+In addition to capabilities, luma.gl can also query the context for all limits.
+These are available as `glGetInfo(gl).limits` and can be indexed with the
+GL constant representing the limit. Each limit is an object with multiple
+values:
+
+- `value` - the value of the limit in the current context
+- `webgl1` - the minimum allowed value of the limit for WebGL1 contexts
+- `webgl2` - the minimum allowed value of the limit for WebGL2 contexts
 

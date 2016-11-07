@@ -3,7 +3,7 @@
 
 // Define some locals
 import {
-  GL, Buffer, Program, draw, checkUniformValues, getUniformsTable
+  GL, Buffer, Program, draw, checkUniformValues, getUniformsTable, glGet
 } from '../webgl';
 import {isWebGLContext} from '../webgl';
 import Object3D from '../scenegraph/object-3d';
@@ -102,7 +102,7 @@ export default class Model extends Object3D {
     this.onAfterRender = onAfterRender;
 
     // assert(program || program instanceof Program);
-    assert(drawMode !== undefined && Number.isFinite(vertexCount),
+    assert(this.drawMode !== undefined && Number.isFinite(this.vertexCount),
       ERR_MODEL_PARAMS);
   }
   /* eslint-enable max-statements */
@@ -162,7 +162,7 @@ export default class Model extends Object3D {
   setGeometry(geometry) {
     this.geometry = geometry;
     this.vertexCount = geometry.getVertexCount();
-    this.drawMode = geometry.drawMode;
+    this.drawMode = glGet(geometry.drawMode);
     this._createBuffersFromAttributeDescriptors(this.geometry.getAttributes());
     this.setNeedsRedraw();
     return this;

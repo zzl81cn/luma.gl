@@ -4,7 +4,7 @@
 /* eslint-disable */ // TODO - this file needs cleanup
 import {Program} from '../webgl';
 import {Plane} from '../core/geometry';
-import {PerspectiveCamera} from '../core/camera';
+import {PerspectiveCamera} from '../deprecated/camera';
 import Scene from '../scenegraph';
 import {splat} from '../utils';
 
