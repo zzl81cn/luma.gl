@@ -40,7 +40,7 @@ void main (void) {
   float Cimag = imag;
 
   int divergeIteration = 0;
-  for (int i = 0; i < 256; i++) {
+  for (int i = 0; i < 32; i++) {
     // z = z^2 + c
     float tempReal = real;
     float tempImag = imag;
@@ -53,14 +53,14 @@ void main (void) {
       divergeIteration = i;
     }
   }
-  int r = divergeIteration / 64;
-  int g = (divergeIteration - r * 64) / 8;
+  int g = divergeIteration / 8;
+  int b = (divergeIteration - g * 8) / 2;
 
   // Base the color on the number of iterations
-  float r_val = fract((float(r) / 8.0));
-  float g_val = fract((float(g) / 8.0));
-  float b_val = fract((float(divergeIteration) / 8.0));
-  gl_FragColor = vec4(b_val, r_val, g_val, 1.0);
+  float g_val = fract((float(g) / 2.0));
+  float b_val = fract((float(b) / 2.0));
+  float r_val = fract((float(divergeIteration) / 2.0));
+  gl_FragColor = vec4(r_val, g_val, b_val, 1.0);
 }
 `;
 
@@ -90,12 +90,10 @@ let centerPoints = [
   [-1.428683445072090832353, 0.162497141672790506229031],
   [-1.749721929742338571710, -0.000029016647753687627476],
   [-1.296354375872896773478, 0.4418515556622909852670589],
-  [-0.896320622847, 0.000000000029],
-  [-1.00183473, -0.00202091]
 ];
 
-let centerOffsetX32 = centerPoints[0][0];
-let centerOffsetY32 = centerPoints[0][1];
+let centerOffsetX32 = centerPoints[3][0];
+let centerOffsetY32 = centerPoints[3][1];
 let zoom32 = 1;
 const zoomThreshold32 = 1e7;
 const width = 2.0;
