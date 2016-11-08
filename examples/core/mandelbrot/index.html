@@ -18,7 +18,7 @@
       }
 
       #container {
-        width: 900px;
+        width: 1000px;
         margin: 128px auto 128px auto;
         background: white;
         padding: 64px;
@@ -56,19 +56,22 @@
     <script src="https://cdn.jsdelivr.net/ace/1.2.4/min/ace.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" src="../../lumagl.js"></script>
     <script type="text/javascript" src="../examples.js"></script>
-    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="mandelbrot-64bit.js"></script>
+    <script type="text/javascript" src="mandelbrot-32bit.js"></script>
   </head>
 
   <body>
     <div id='container'>
       <div id='title'>Rendering Mandelbrot Sets with LumaGL</div>
       <div id='text-container'>
-        <div id='zoom'></div>
-        <canvas id="canvas-1"></canvas>
-        <p>Zoom in on mandelbrot set</p>
-        <p>32 bits only goes to 50,000x</p>
         <canvas id="canvas-0"></canvas>
-        <p>Should try 64 bits</p>
+        <p id='zoom-32bit'></p>
+        <p>32-bit Mandelbrot</p>
+        <p>32 bit calculation breaks down at ~1e6</p>
+        <canvas id="canvas-1"></canvas>
+        <p id='zoom-64bit'></p>
+        <p>64-bit Mandelbrot</p>
+        <p>64 bit calculation can go all the way down to ~1e14</p>
       </div>
   </body>
 
