@@ -2,7 +2,7 @@
 /* eslint-disable no-try-catch, no-loop-func */
 /* global document */
 import GL, {WebGLRenderingContext, webGLTypesAvailable} from './api';
-import {assertWebGLContext, isWebGL2Context} from './api';
+import {assertWebGLContext, assertWebGL2Context, isWebGL2Context} from './api';
 import queryManager from './helpers/query-manager';
 import {log, isBrowser, isPageLoaded, pageLoadPromise} from '../utils';
 import luma from '../globals';
@@ -145,14 +145,6 @@ export function getGLExtension(gl, extensionName) {
   return extension;
 }
 
-// POLLING FOR PENDING QUERIES
-
-// Calling this function checks all pending queries for completion
-export function poll(gl) {
-  assertWebGLContext(gl);
-  queryManager.poll(gl);
-}
-
 // VERY LIMITED / BASIC GL STATE MANAGEMENT
 
 // Executes a function with gl states temporarily set, exception safe
@@ -276,9 +268,26 @@ function validateArgsAndLog(functionName, functionArgs) {
   }
 }
 
-// Deprecated methods
+/* eslint-disable brace-style */
+export default class context {
+  static create(...args) { return createGLContext(args); }
 
-export function getExtension(gl, extensionName) {
-  log.warn(0, 'luma.gl: getExtension is deprecated');
-  return getGLExtension(gl, extensionName);
+  static getAttributes(gl) { return gl.getContextAttributes; }
+  static getInfo(gl) { return getGLContextInfo(gl); }
+  static getCaps(gl) { return {}; }
+  static getLimits(gl) { return {}; }
+  static hasExtension(gl) { return getGLExtension(gl); }
+  static getExtension(gl) { return getGLExtension(gl); }
+
+  static withParameters(...args) { return glContextWithState(args); }
+
+  // POLLING FOR PENDING QUERIES
+  // Calling this function checks all pending queries for completion
+  static poll(gl) {
+    queryManager.poll(gl);
+  }
+
+  static assertWebGL(gl) { assertWebGLContext(gl); }
+  static assertWebGL2(gl) { assertWebGL2Context(gl); }
+  static isWebGL2(gl) { return isWebGL2Context(gl); }
 }

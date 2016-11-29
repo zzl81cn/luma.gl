@@ -22,10 +22,10 @@ if a capability is supported or not.
 
 Example:
 ```
-const caps = getGLInfo(gl);
+const caps = getCaps(gl);
 
 // true if gl is a WebGL2 context, or OES_TEXTURE_FLOAT extension is available
-if (info.caps.TEXTURE_FLOAT) {
+if (caps.TEXTURE_FLOAT) {
   const texture = new Texture2D({width, height, type: GL.FLOAT});
   ...
 }
@@ -33,16 +33,14 @@ if (info.caps.TEXTURE_FLOAT) {
 
 ## General/Debug Capabilities
 
-## Debug Capabilities
-
 | Capability           | Extension | Enables | luma.gl support |
 | -------------------- | --------- | ------- | --------------- |
 | DEBUG_RENDERER_INFO  | [WEBGL_debug_renderer_info](https://www.khronos.org/registry/webgl/extensions/WEBGL_debug_renderer_info/) | Returns strings identifying GPU | glGetDebugInfo, logged to console on startup |
-| DEBUG_SHADERS        | WEBGL_debug_shaders | | TBD |
-| DISJOINT_TIMER_QUERY | EXT_disjoint_timer_query, EXT_disjoint_timer_query_webgl2 | Enables async queries of GPU timings | Luma offers Query objects with queryTime under WebGL1 and WebGL2 |
+| DEBUG_SHADERS        | WEBGL_debug_shaders | Translated shader source | `Shader.getTranslatedSource`, shader compilation logs in debug mode |
+| DISJOINT_TIMER_QUERY | EXT_disjoint_timer_query, EXT_disjoint_timer_query_webgl2 | Async queries of GPU timings | `Query` class with `queryTime` under both WebGL1 and WebGL2 |
 | LOSE_CONTEXT         | [WEBGL_lose_context](https://www.khronos.org/registry/webgl/extensions/WEBGL_lose_context/) | Simulate context loss | TBD |
-| -                    | [WEBGL_shared_resources](https://www.khronos.org/registry/webgl/WEBGL_shared_resources/) | Share resource between WebGL contexts | TBD |
-|                      | [WEBGL_security_sensitive_resources](https://www.khronos.org/registry/webgl/WEBGL_security_sensitive_resources/) | Cross-origin resource loading | TBD |
+| SHARED_RESOURCES     | [WEBGL_shared_resources](https://www.khronos.org/registry/webgl/WEBGL_shared_resources/) | Share resource between WebGL contexts | TBD |
+| SECURITY_SENSITIVE_RESOURCES | [WEBGL_security_sensitive_resources](https://www.khronos.org/registry/webgl/WEBGL_security_sensitive_resources/) | Cross-origin resource loading | TBD |
 
 Remarks:
 * luma.gl uses the debug extensions under the hood (when available) to provide
@@ -96,7 +94,7 @@ slower to load, they could allow 4x more textures to be uploaded in the same
 amount of GPU memory.
 
 | Capability | Extension | Enables | luma.gl support |
-| --- | --- | --- |
+| ---------- | --------- | ------- | --------------- |
 | COMPRESSED_TEXTURE_S3TC | WEBGL_compressed_texture_s3tc | Certain S3TC compressed texture formats | None |
 | COMPRESSED_TEXTURE_ATC | WEBGL_compressed_texture_atc | Certain AMD compressed texture formats | None |
 | COMPRESSED_TEXTURE_PVRTC | WEBGL_compressed_texture_pvrtc | Certain IMG compressed texture formats | None |
@@ -121,13 +119,13 @@ a range of target devices is another consideration.
 Khronos lists a couple of proposed extensions. They will be considered by
 luma.gl as they become available in browsers.
 
-| Extension | Enables | luma.gl support |
-| --- | --- | --- |
+| Extension | Enables | luma.gl support plans |
+| --------- | ------- | --------------------- |
 | EXT_clip_cull_distance (WebGL2) | hardware clip/cull planes (ES3.2) |  |
-| EXT_float_blend | 32 bit color blending | |
-| EXT_texture_storage | texture storage effiency | |
-| WEBGL_debug | Debug events | |
-| WEBGL_dynamic_texture | frequently changin textures | |
+| EXT_float_blend        | 32 bit color blending | |
+| EXT_texture_storage    | texture storage effiency | |
+| WEBGL_debug            | Debug events | |
+| WEBGL_dynamic_texture  | frequently changin textures | |
 | WEBGL_subarray_uploads | Efficient buffer update | |
 
 ## About WebGL Extensions
@@ -154,15 +152,3 @@ basic categories:
 Also note that because luma.gl gives the application direct access to the WebGL
 context, the application can always work directly with any extensions it needs.
 Using the support that luma.gl provides for a specific extension is optional.
-
-# Limits
-
-In addition to capabilities, luma.gl can also query the context for all limits.
-These are available as `glGetInfo(gl).limits` and can be indexed with the
-GL constant representing the limit. Each limit is an object with multiple
-values:
-
-- `value` - the value of the limit in the current context
-- `webgl1` - the minimum allowed value of the limit for WebGL1 contexts
-- `webgl2` - the minimum allowed value of the limit for WebGL2 contexts
-

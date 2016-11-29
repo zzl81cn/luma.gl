@@ -1,6 +1,7 @@
 // WebGL2 Query Helper
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGLQuery
 import GL, {assertWebGLContext, isWebGL2Context} from '../webgl/api';
+import Resource from '../webgl/resource';
 import queryManager from '../webgl/helpers/query-manager';
 
 // WebGL2 VertexArray Objects Helper
@@ -32,6 +33,18 @@ function getTimerQueryExtension(gl) {
   return extension || EMPTY_EXTENSION;
 }
 
+function deleteQuery(handle) {
+  // if (this.handle) {
+  //   if (this.webgl2) {
+  //     this.gl.deleteQuery(this.handle);
+  //   } else {
+  //     this.ext.deleteQueryEXT(this.handle);
+  //   }
+  // }
+  // this.handle = null;
+  // return this;
+}
+
 /* eslint-disable max-len */
 // gl.ANY_SAMPLES_PASSED // Specifies an occlusion query: these queries detect whether an object is visible (whether the scoped drawing commands pass the depth test and if so, how many samples pass).
 // gl.ANY_SAMPLES_PASSED_CONSERVATIVE // Same as above above, but less accurate and faster version.
@@ -40,7 +53,7 @@ function getTimerQueryExtension(gl) {
 // gl.QUERY_RESULT: Returns a GLuint containing the query result.
 // gl.QUERY_RESULT_AVAILABLE: Returns a GLboolean indicating whether or not a query result is available.
 
-export default class Query {
+export default class Query extends Resource {
   /**
    * Returns true if Query is supported by the WebGL implementation
    * (depends on the EXT_disjoint_timer_query extension)/
@@ -129,9 +142,10 @@ export default class Query {
     onComplete = noop,
     onError = noop
   } = {}) {
+    super();
+
     if (isWebGL2Context(gl)) {
       this.ext = this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
-      this.handle = gl.createQuery();
       this.webgl2 = true;
     } else {
       this.ext = this.gl.getExtension('EXT_disjoint_timer_query');
@@ -139,10 +153,7 @@ export default class Query {
       this.webgl2 = false;
     }
 
-    this.gl = gl;
     this.target = null;
-    this.userData = {};
-
     this.onComplete = onComplete;
     this.onError = onError;
 
@@ -152,22 +163,13 @@ export default class Query {
     Object.seal(this);
   }
 
-  /**
-   * Destroys the WebGL object
-   * Rejects any pending query
-   * @return {Query} - returns itself, to enable chaining of calls.
-   */
-  delete() {
+  _createHandle() {
+    return this.gl.createQuery();
+  }
+
+  _deleteHandle() {
     queryManager.deleteQuery(this);
-    if (this.handle) {
-      if (this.webgl2) {
-        this.gl.deleteQuery(this.handle);
-      } else {
-        this.ext.deleteQueryEXT(this.handle);
-      }
-    }
-    this.handle = null;
-    return this;
+    deleteQuery(this.gl, this.handle);
   }
 
   // Shortcut for timer query (dependent on extension in both WebGL1 and 2)
@@ -326,3 +328,95 @@ queryManager.setInvalidator({
   // Note: Querying the disjoint state resets it
   checkInvalid: gl => gl.getParameter(GL.GPU_DISJOINT_EXT)
 });
+
+/* TODO - remove code below
+/* eslint-disable max-len *
+// gl.ANY_SAMPLES_PASSED // Specifies an occlusion query: these queries detect whether an object is visible (whether the scoped drawing commands pass the depth test and if so, how many samples pass).
+// gl.ANY_SAMPLES_PASSED_CONSERVATIVE // Same as above above, but less accurate and faster version.
+// gl.TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN // Number of primitives that are written to transform feedback buffers.
+
+// gl.QUERY_RESULT: Returns a GLuint containing the query result.
+// gl.QUERY_RESULT_AVAILABLE: Returns a GLboolean indicating whether or not a query result is available.
+
+export default class Query {
+
+  static isSupported(gl) {
+    return isWebGL2Context(gl);
+  }
+
+  /**
+   * @class
+   * @param {WebGL2Context} gl
+   *
+  constructor(gl) {
+    assertWebGL2Context(gl);
+    const handle = gl.createQuery();
+    glCheckError(gl);
+
+    this.gl = gl;
+    this.handle = handle;
+    this.target = null;
+    this.userData = {};
+
+    // query manager needs a promise field
+    this.promise = null;
+
+    Object.seal(this);
+  }
+
+  /*
+   * @return {Query} returns self to enable chaining
+   *
+  delete() {
+    queryManager.deleteQuery(this);
+    if (this.handle) {
+      this.gl.deleteQuery(this.handle);
+      this.handle = null;
+      glCheckError(this.gl);
+    }
+    return this;
+  }
+
+  /*
+   * @return {Query} returns self to enable chaining
+   *
+  begin(target) {
+    queryManager.beginQuery(this);
+    this.target = target;
+    this.gl.beginQuery(target, this.handle);
+    glCheckError(this.gl);
+    return this;
+  }
+
+  /*
+   * @return {Query} returns self to enable chaining
+   *
+  end() {
+    if (this.target) {
+      this.target = null;
+      this.gl.endQuery(this.target);
+      glCheckError(this.gl);
+    }
+    return this;
+  }
+
+  cancel() {
+    this.end();
+    queryManager.cancelQuery(this);
+    return this;
+  }
+
+  isResultAvailable() {
+    return this.gl.getQueryParameter(this.handle,
+      this.gl.QUERY_RESULT_AVAILBLE);
+  }
+
+  getResult() {
+    return this.gl.getQueryParameter(this.handle, this.gl.QUERY_RESULT);
+  }
+
+  static poll(gl) {
+    queryManager.poll(gl);
+  }
+}
+*/

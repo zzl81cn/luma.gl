@@ -11,7 +11,7 @@ of time during development.
   on exceptions where they happen in the luma code can be very helpful.
 * Luma allows you to set `id`s on many classes, which allows you to easily
   check in the debugger which object is involved in a stack trace.
-* Luma has takes care to extract as much information as possible about
+* Luma takes care to extract as much information as possible about
   shader compiler errors etc, and will throw exceptions with very detailed
   error strings when shaders fail to compile.
 * Luma also understands `glslify` "names", making it possible to name shaders

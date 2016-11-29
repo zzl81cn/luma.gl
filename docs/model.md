@@ -124,18 +124,6 @@ program.setUniforms({
 
 
 
-Model Method: setTexture {#Model:setTexture}
--------------------------------------------------
-
-
-Model Method: setTextures {#Model:setTextures}
-----------------------------------------------------
-
-Sets a number of textures on the program.
-
-
-Model accessor get hash
---------------------------
 
 Model method setInstanceCount
 --------------------------

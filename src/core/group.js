@@ -1,5 +1,4 @@
 import Object3D from './object-3d';
-import {Mat4} from '../deprecated';
 import assert from 'assert';
 
 export default class Group extends Object3D {
@@ -35,34 +34,34 @@ export default class Group extends Object3D {
     return this;
   }
 
-  * traverse({viewMatrix = new Mat4()} = {}) {
+  * traverse({viewMatrix} = {}) {
     for (const child of this.children) {
       const {matrix} = child;
-      const worldMatrix = viewMatrix.mulMat4(matrix);
+      // const worldMatrix = viewMatrix.mulMat4(matrix);
       if (child instanceof Group) {
-        yield* child.traverse({matrix, worldMatrix});
+        yield* child.traverse({matrix, viewMatrix});
       } else {
-        if (child.program) {
-          child.program.use();
-          child.program.setUniforms({worldMatrix});
-        }
+        // if (child.program) {
+        //   child.program.use();
+        //   child.program.setUniforms({worldMatrix});
+        // }
         yield child;
       }
     }
   }
 
-  * traverseReverse({viewMatrix = new Mat4()} = {}) {
+  * traverseReverse({viewMatrix} = {}) {
     for (let i = this.children.length - 1; i >= 0; --i) {
       const child = this.children[i];
       const {matrix} = child;
-      const worldMatrix = viewMatrix.mulMat4(matrix);
+      // const worldMatrix = viewMatrix.mulMat4(matrix);
       if (child instanceof Group) {
-        yield* child.traverseReverse({matrix, worldMatrix});
+        yield* child.traverseReverse({matrix, viewMatrix});
       } else {
-        if (child.program) {
-          child.program.use();
-          child.program.setUniforms({worldMatrix});
-        }
+        // if (child.program) {
+        //   child.program.use();
+        //   child.program.setUniforms({worldMatrix});
+        // }
         yield child;
       }
     }

@@ -6,7 +6,7 @@ import {
   GL, Buffer, Program, draw, checkUniformValues, getUniformsTable, glGet
 } from '../webgl';
 import {isWebGLContext} from '../webgl';
-import Object3D from '../scenegraph/object-3d';
+import Object3D from './object-3d';
 import {log, formatValue} from '../utils';
 import assert from 'assert';
 

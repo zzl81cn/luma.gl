@@ -3,8 +3,9 @@
 
 ## Core classes
 
-* **Model** - A smart wrapper around the WebGL `Program` class.
-* **AnimationFrame** - 
+* **Model** - Smart wrapper around the WebGL `Program` class.
+* **AnimationFrame** - Smart wrapper around 'requestAnimationFrame'
+
 
 ## Companion Modules
 
@@ -19,23 +20,30 @@ luma.gl offers a number of companion "modules":
 * **Geometry Primitives** - Cubes, Spheres, Cones etc.
 * **IO** - Load images and data both in the Browser and under Node.js.
 
+
 ## WebGL Classes
 
 luma.gl's WebGL classes offer a simple way to work with WebGL in JavaScript,
-without hiding the WebGL API.
-In this sense, luma.gl is not a classic "WebGL Framework", because it
+without hiding or interfering with the WebGL API.
+In this sense, luma.gl is not a classic "WebGL Framework": it intentionally
 doesn't try to manage WebGL objects, or hide them from the developer
 under higher levels of abstraction.
 
-Some highlights:
-* One class per WebGL object - Work directly with OpenGL objects
-  (Buffers, Textures, Programs, Framebuffers) etc just like you always have.
-* Boilerplate reduction - luma.gl automatically deduces common parameters.
-* WebGL State Management - Allows functions to locally set global GL state.
-* WebGL Capability Management - Simplifies working with WebGL extensions and
-creating code that works across WebGL versions (WebGL 1 and WebGL 2).
+Highlights:
+* Familiar API - Work directly with classes mapping to the familiar OpenGL
+  objects (Buffers, Textures, Programs, Framebuffers etc) and use the standard
+  GL constants just like you always have.
+* Stateless WebGL - Easy to locally override global GL state.
+* Portability - luma.gl simplifies working with WebGL extensions and
+  creating code that works across WebGL versions (WebGL 1 and WebGL 2).
+  And `Capabilities` helps your app determine what features are available.
+* Boilerplate reduction - luma.gl automatically deduces common parameters and
+  binds/unbinds your resources as needed.
 * No ownership of WebGL context. Use your luma.gl context with other WebGL
   code, or use luma.gl with WebGL contexts created by other frameworks.
+
+| ==== | ===== |
+| Buffer |
 
 ## General Comments
 
@@ -63,7 +71,7 @@ JavaScript, without adding an abstraction layer.
   message indicating the problem inline in the shader's GLSL source.
 
 To maximize interoperability with WebGL code that does not use luma.gl, the
-WebGLRendingContexttype does not have a corresponding luma.gl wrapper class,
+WebGLRendingContext type does not have a corresponding luma.gl wrapper class,
 but is instead used directly by the luma.gl API.
 A simple global function is provided to help in creating gl contexts.
 

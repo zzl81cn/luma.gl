@@ -1,11 +1,12 @@
 // WebGL2 VertexArray Objects Helper
 import {WebGL2RenderingContext, assertWebGLContext} from '../webgl/api';
+import Resource from '../webgl/resource';
 import assert from 'assert';
 
 /* eslint-disable camelcase */
 const OES_vertex_array_object = 'OES_vertex_array_object';
 
-export default class VertexArrayObject {
+export default class VertexArrayObject extends Resource {
 
   // Returns true if VertexArrayObject is supported by implementation
   static isSupported(gl) {
@@ -16,35 +17,13 @@ export default class VertexArrayObject {
     );
   }
 
-  // Wraps a WebGLVertexArrayObject in a VertexArrayObject
-  static wrap(gl, object) {
-    return object instanceof VertexArrayObject ?
-      object :
-      new VertexArrayObject(gl, {handle: object.handle || object});
-  }
-
   // Create a VertexArrayObject
-  constructor(gl, {handle} = {}) {
+  constructor(gl, opts = {}) {
     assertWebGLContext(gl);
     assert(VertexArrayObject.isSupported(gl),
       'VertexArrayObject: WebGL2 or OES_vertex_array_object required');
-
-    handle = handle || createVertexArray(gl);
-    // TODO isVertexArray fails when using extension for some reason
-    // if (!isVertexArray(gl, handle)) {
-    if (!handle) {
-      throw new Error('Could not create VertexArrayObject');
-    }
-
-    this.gl = gl;
-    this.handle = handle;
-    this.userData = {};
+    super(gl, opts);
     Object.seal(this);
-  }
-
-  delete() {
-    deleteVertexArray(this.gl, this.handle);
-    return this;
   }
 
   bind() {
@@ -55,6 +34,20 @@ export default class VertexArrayObject {
   unbind() {
     bindVertexArray(this.gl, null);
     return this;
+  }
+
+  // PRIVATE METHODS
+
+  _createHandle() {
+    return createVertexArray(this.gl);
+  }
+
+  _deleteHandle(handle) {
+    deleteVertexArray(this.gl, handle);
+  }
+
+  _checkHandle(handle) {
+    isVertexArray(this.gl, handle);
   }
 }
 

@@ -5,7 +5,7 @@
 import {Program} from '../webgl';
 import {Plane} from '../core/geometry';
 import {PerspectiveCamera} from '../deprecated/camera';
-import Scene from '../scenegraph';
+import Scene from '../deprecated/scene';
 import {splat} from '../utils';
 
 // length given a 45 fov angle, and 0.2 distance to camera

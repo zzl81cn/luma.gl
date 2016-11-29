@@ -75,7 +75,7 @@ new AnimationFrame()
 ## AnimationFrame Methods
 
 
-### constructor
+### `AnimationFrame` constructor
 
 Parameters:
 * `gl` - Sets this `AnimationFrame`'s `WebGLRenderingContext`.
@@ -87,7 +87,7 @@ Remarks:
   been fully loaded.
 
 
-### initContext
+### `AnimationFrame.initContext`
 
 Postpones context creation until the page (i.e. all HTML) has been loaded.
 At this time it is safe to specify canvas ids when calling `createGLContext`.
@@ -103,7 +103,7 @@ Remarks:
   `WebGLRenderingContext` was supplied to the AnimationFrame constructor.
 
 
-### init(callback)
+### `AnimationFrame.init`(callback)
 
 * `callback` - function that takes a context object. It will be called
   exactly once, after page load completes and a context has been created.
@@ -111,7 +111,7 @@ Remarks:
 The callback will be called with an initial context object, containing
 
 
-### setupFrame(callback)
+### `AnimationFrame.setupFrame`(callback)
 
 Supplying this callback overrides the default frame setup code, which
 resizes the canvas and the viewport after the window size.
@@ -120,17 +120,17 @@ For applications that use a single full screen canvas, this function is
 usually not needed.
 
 
-### frame(callback)
+### `AnimationFrame.frame`(callback)
 
 Calling `frame` will automatically start the animation. If this is not
 desired, follow immediately with a stop.
 
 
-### stop
+### `AnimationFrame.stop`
 
 Stops the animation
 
 
-### start
+### `AnimationFrame.start`
 
 Restarts the animation

@@ -3,8 +3,8 @@
 
 import {Vector3} from '../math';
 import {merge} from '../utils';
-import Group from './group';
-import {pickModels} from './pick';
+import Group from '../core/group';
+import {pickModels} from '../core/pick';
 import assert from 'assert';
 
 const MAX_TEXTURES = 10;
