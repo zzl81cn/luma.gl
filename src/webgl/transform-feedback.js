@@ -1,8 +1,7 @@
 // WebGL2 Transform Feedback Helper
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGLQuery
 
-import {WebGL2RenderingContext} from './webgl-types';
-import {glCheckError} from '../context';
+import {glCheckError, isWebGL2Context} from './webgl-checks';
 import assert from 'assert';
 
 /* eslint-disable max-len */
@@ -14,14 +13,14 @@ import assert from 'assert';
 // void pauseTransformFeedback();
 // void resumeTransformFeedback();
 
-export default class TranformFeedback {
+export default class TransformFeedback {
 
   /**
    * @class
    * @param {WebGL2RenderingContext} gl
    */
   constructor(gl) {
-    assert(gl instanceof WebGL2RenderingContext);
+    assert(isWebGL2Context(gl));
     this.gl = gl;
     this.handle = gl.createTransformFeedback();
     this.userData = {};
@@ -41,19 +40,18 @@ export default class TranformFeedback {
   }
 
   /**
-   * @param {GLenum} target
    * @return {TransformFeedback} returns self to enable chaining
    */
-  bind(target) {
+  bind() {
     const {gl} = this;
-    gl.bindTransformFeedback(target, this.handle);
+    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, this.handle);
     glCheckError(gl);
     return this;
   }
 
-  unbind(target) {
+  unbind() {
     const {gl} = this;
-    gl.bindTransformFeedback(target, null);
+    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
     glCheckError(gl);
     return this;
   }
@@ -102,7 +100,7 @@ export default class TranformFeedback {
   /**
    * @param {WebGLProgram?} program
    * @param {sequence<DOMString>} varyings
-   * @param {GLenum} bufferMode
+   * @param {GLenum} bufferMode gl.INTERLEAVED_ATTRIBS or gl.SEPARATE_ATTRIBS.
    * @return {TransformFeedback} returns self to enable chaining
    */
   varyings(program, varyings, bufferMode) {

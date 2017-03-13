@@ -20,6 +20,7 @@ export {isWebGLContext, isWebGL2Context} from './webgl/webgl-checks';
 
 // WebGL2 & Extensions
 export {default as TimerQuery} from './webgl/timer-query';
+export {default as TransformFeedback} from './webgl/transform-feedback';
 export {default as VertexArrayObject} from './webgl/vertex-array-object';
 
 // Core
