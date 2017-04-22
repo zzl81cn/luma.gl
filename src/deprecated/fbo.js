@@ -1,5 +1,4 @@
-import {GL} from '../webgl/webgl';
-import {assertWebGLContext} from '../webgl/webgl-checks';
+import GL, {assertWebGLContext} from '../webgl';
 import Framebuffer from '../webgl/framebuffer';
 import Renderbuffer from '../webgl/renderbuffer';
 import Texture2D from '../webgl/texture-2d';
@@ -44,8 +43,10 @@ export default class FramebufferObject {
     const fb = new Framebuffer(gl);
 
     const colorBuffer = new Texture2D(gl, {
-      minFilter: this.minFilter,
-      magFilter: this.magFilter
+      parameters: {
+        [GL.MIN_FILTER]: this.minFilter,
+        [GL.MAG_FILTER]: this.magFilter
+      }
     })
     // TODO - should be handled by Texture2D constructor?
     .setImageData({
