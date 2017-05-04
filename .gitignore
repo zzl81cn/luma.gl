@@ -1,6 +1,7 @@
 build/*
 dist/*
 dist-es6/*
+dist-min/*
 dist-buble/*
 demo/dist/*
 .coverage

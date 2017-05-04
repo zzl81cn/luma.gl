@@ -2,6 +2,9 @@ import Texture from './texture';
 import {withParameters} from './context';
 import assert from 'assert';
 
+// Hack to make minification handle constants
+export default (function() {
+
 // Literal constants, should be "folded" during minification
 const GL_TEXTURE_CUBE_MAP = 0x8513;
 // To check the current texture binding, gl.getParameter(gl.TEXTURE_BINDING_CUBE_MAP)
@@ -13,10 +16,12 @@ const GL_TEXTURE_CUBE_MAP_NEGATIVE_Y = 0x8518;
 const GL_TEXTURE_CUBE_MAP_POSITIVE_Z = 0x8519;
 const GL_TEXTURE_CUBE_MAP_NEGATIVE_Z = 0x851A;
 
+const GL_TEXTURE0 = 0;
+
 const GL_RGBA = 0x1908;
 const GL_UNSIGNED_BYTE = 0x1401;
 
-export default class TextureCube extends Texture {
+class TextureCube extends Texture {
   constructor(gl, opts = {}) {
     super(gl, Object.assign({}, opts, {target: GL_TEXTURE_CUBE_MAP}));
     this.initialize(opts);
@@ -116,7 +121,7 @@ export default class TextureCube extends Texture {
   }) {
     const {gl} = this;
     pixels = pixels || data;
-    this.bind();
+    gl.bindTexture(GL_TEXTURE_CUBE_MAP, this.handle);
     if (this.width || this.height) {
       gl.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
         0, format, width, height, border, format, type, pixels.pos.x);
@@ -131,18 +136,15 @@ export default class TextureCube extends Texture {
       gl.texImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
         0, format, width, height, border, format, type, pixels.neg.z);
     } else {
-      gl.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-        0, format, format, type, pixels.pos.x);
-      gl.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-        0, format, format, type, pixels.pos.y);
-      gl.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-        0, format, format, type, pixels.pos.z);
-      gl.texImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-        0, format, format, type, pixels.neg.x);
-      gl.texImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-        0, format, format, type, pixels.neg.y);
-      gl.texImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-        0, format, format, type, pixels.neg.z);
+      gl.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, format, format, type, pixels.pos.x);
+      gl.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, format, format, type, pixels.pos.y);
+      gl.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, format, format, type, pixels.pos.z);
+      gl.texImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, format, format, type, pixels.neg.x);
+      gl.texImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, format, format, type, pixels.neg.y);
+      gl.texImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, format, format, type, pixels.neg.z);
     }
   }
 }
+
+return TextureCube;
+});
