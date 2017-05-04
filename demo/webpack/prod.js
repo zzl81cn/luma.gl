@@ -1,9 +1,10 @@
 const config = require('./config');
+const path = require('path');
 
 module.exports = Object.assign(config, {
 
   output: {
-    path: './dist',
+    path: path.resolve('./dist'),
     filename: 'bundle.js'
   }
 

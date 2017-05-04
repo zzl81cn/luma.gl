@@ -2,6 +2,7 @@ build/*
 dist/*
 dist-es6/*
 dist-buble/*
+demo/dist/*
 .coverage
 .nyc_output
 _docs

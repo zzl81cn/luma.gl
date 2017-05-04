@@ -44,11 +44,21 @@ const initExample = (contextName = 'lumagl-canvas') => {
         const reflection = parseFloat(document.getElementById('reflection').value);
         const refraction = parseFloat(document.getElementById('refraction').value);
 
+        prism.render({
+          uTexture: cubemap,
+          uModel: new Matrix4().rotateX(tick * 0.01).rotateY(tick * 0.013),
+          uView: view,
+          uProjection: projection,
+          uReflect: reflection,
+          uRefract: refraction
+        });
+
       });
   }
   renderControls(contextName);
-}
+};
 
+/*
 const animationFrame = new AnimationLoop()
 .context(() => createGLContext({canvas: 'render-canvas'}))
 .init(({gl}) => {
@@ -97,6 +107,7 @@ const animationFrame = new AnimationLoop()
 
   return animationFrame;
 });
+*/
 
 function getCube(gl) {
   return new Cube({

@@ -1,12 +1,12 @@
 /* eslint-disable no-var, max-statements */
-import {GL, AnimationLoop, createGLContext, Cube, Matrix4, radians} from 'luma.gl';
+import {GL, AnimationFrame, createGLContext, Cube, Matrix4, radians} from 'luma.gl';
 
 const SIDE = 256;
 let animationFrame;
 
 const initExample = (contextName = 'lumagl-canvas') => {
   if (!animationFrame) {
-    animationFrame = new AnimationLoop();
+    animationFrame = new AnimationFrame();
 
     animationFrame
       .context(() => createGLContext({canvas: contextName}))
@@ -41,6 +41,7 @@ const initExample = (contextName = 'lumagl-canvas') => {
   return animationFrame;
 };
 
+/*
 const animationLoop = new AnimationLoop({
   onCreateContext({canvas = 'lumagl-canvas'}) {
     return createGLContext({canvas});
@@ -72,7 +73,7 @@ const animationLoop = new AnimationLoop({
     });
   }
 });
-
+/*
 const animationFrame = new AnimationLoop()
 .context(() => createGLContext({canvas: 'render-canvas'}))
 .init(({gl}) => {
@@ -101,6 +102,7 @@ const animationFrame = new AnimationLoop()
       Matrix4.perspective({fov: radians(60), aspect, near: 1, far: 2048.0})
   });
 });
+*/
 
 function makeInstancedCube(gl) {
   let offsets = [];
@@ -165,7 +167,7 @@ void main(void) {
 }
 
 export default initExample;
-export {animationLoop};
+// xport {animationLoop};
 
 /* expose on Window for standalone example */
 /* global window */
