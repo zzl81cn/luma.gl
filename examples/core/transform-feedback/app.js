@@ -68,34 +68,6 @@ const FS_FEEDBACK = `#version 300 es
   }
 `;
 
-const createShader = (gl, source, type) => {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  return shader;
-};
-
-const createProgram = (gl, vsSource, fsSource) => {
-  const program = gl.createProgram();
-  const vShader = createShader(gl, vsSource, gl.VERTEX_SHADER);
-  const fShader = createShader(gl, fsSource, gl.FRAGMENT_SHADER);
-  gl.attachShader(program, vShader);
-  gl.deleteShader(vShader);
-  gl.attachShader(program, fShader);
-  gl.deleteShader(fShader);
-  // gl.linkProgram(program);
-
-  const log = gl.getProgramInfoLog(program) ||
-    gl.getShaderInfoLog(vShader) ||
-    gl.getShaderInfoLog(fShader);
-
-  if (log) {
-    console.log(log);
-  }
-
-  return program;
-};
-
 class Root extends PureComponent {
   constructor(props) {
     super(props);
@@ -157,7 +129,7 @@ class Root extends PureComponent {
         usage: gl.STATIC_COPY,
         type: gl.FLOAT
       })
-    ]
+    ];
 
     // ---- SETUP VERTEX ARRAYS ---- //
     const vaoTransform = new VertexArrayObject(gl).bind();
@@ -247,8 +219,8 @@ class Root extends PureComponent {
     const {width, height} = this.state;
     return width && height && <canvas style={{width, height}}
       onMouseMove={this._onMouseMove} ref={canvas => {
-      this.canvas = canvas;
-    }}/>;
+        this.canvas = canvas;
+      }}/>;
   }
 }
 
