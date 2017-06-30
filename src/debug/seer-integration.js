@@ -28,6 +28,7 @@ export const logModel = (model, uniforms) => {
   const uniformsObject = Object.assign({}, model.uniforms, uniforms);
 
   seer.multiUpdate('luma.gl', model.id, [
+    {path: 'badges', data: ['Model']},
     {path: 'objects.uniforms', data: uniformsObject},
     {path: 'objects.attributes', data: attributesObject}
   ]);
