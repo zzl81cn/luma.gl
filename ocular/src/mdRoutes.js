@@ -42,55 +42,54 @@ export default [{
   path: '/docs',
   data: [{
     name: 'API Reference',
-    path: '/api-reference',
-    data: [
+    children: [
       {
         name: 'Introduction',
-        content: apiReference
+        markdown: apiReference
       },
       {
         name: 'AnimationLoop',
-        content: animationLoop
+        markdown: animationLoop
       },
       {
         name: 'Buffer',
-        content: buffer
+        markdown: buffer
       },
       {
         name: 'Geometry',
-        content: geometry
+        markdown: geometry
       },
       // {
       //   name: 'Group',
-      //   content: group
+      //   markdown: group
       // },
       {
         name: 'Model',
-        content: model
+        markdown: model
       },
       {
         name: 'Model:Cone',
-        content: cone
+        markdown: cone
       },
       {
         name: 'Model:Cube',
-        content: cube
+        markdown: cube
       },
       {
         name: 'Model:Cylinder',
-        content: cylinder
+        markdown: cylinder
       },
       {
         name: 'Model:IcoSphere',
-        content: icoSphere
+        markdown: icoSphere
       },
       {
         name: 'Model:Plane',
-        content: plane
+        markdown: plane
       },
       {
         name: 'Model:Sphere',
-        content: sphere
+        markdown: sphere
       },
       // {
       //   name: 'Object3d',
@@ -102,107 +101,107 @@ export default [{
       // },
       {
         name: 'Program',
-        content: program
+        markdown: program
       },
       {
         name: 'Query',
-        content: query
+        markdown: query
       },
       {
         name: 'Renderbuffer',
-        content: renderbuffer
+        markdown: renderbuffer
       },
       {
         name: 'Resource',
-        content: resource
+        markdown: resource
       },
       {
         name: 'Sampler',
-        content: sampler
+        markdown: sampler
       },
       {
         name: 'Shader',
-        content: shader
+        markdown: shader
       },
       {
         name: 'ShaderCache',
-        content: shaderCache
+        markdown: shaderCache
       },
       {
         name: 'Shader Modules',
-        content: shadertools
+        markdown: shadertools
       },
       {
         name: 'Shader Module:picking',
-        content: shadertoolsPicking
+        markdown: shadertoolsPicking
       },
       {
         name: 'Texture',
-        content: texture
+        markdown: texture
       },
       {
         name: 'Texture2D',
-        content: texture2d
+        markdown: texture2d
       },
       {
         name: 'Texture2DArray',
-        content: texture2dArray
+        markdown: texture2dArray
       },
       {
         name: 'Texture3D',
-        content: texture3d
+        markdown: texture3d
       },
       {
         name: 'TextureCube',
-        content: textureCube
+        markdown: textureCube
       },
       {
         name: 'TransformFeedback',
-        content: transformFeedback
+        markdown: transformFeedback
       },
       {
         name: 'UniformBufferLayout',
-        content: uniformBufferLayout
+        markdown: uniformBufferLayout
       },
       {
         name: 'VertexArray',
-        content: vertexArray
+        markdown: vertexArray
       },
       {
         name: 'createGLContext',
-        content: context
+        markdown: context
       },
       {
         name: 'isWebGL2',
-        content: contextIsWebGL2
+        markdown: contextIsWebGL2
       },
       {
         name: 'hasFeature(s)',
-        content: contextHasFeatures
+        markdown: contextHasFeatures
       },
       {
         name: 'getFeatures',
-        content: contextGetFeatures
+        markdown: contextGetFeatures
       },
       {
         name: 'getContextInfo',
-        content: contextGetContextInfo
+        markdown: contextGetContextInfo
       },
       {
         name: 'getContextLimits',
-        content: contextGetContextLimits
+        markdown: contextGetContextLimits
       },
       {
         name: 'get|setParameter(s)',
-        content: contextGetParameters
+        markdown: contextGetParameters
       },
       {
         name: 'resetParameters',
-        content: contextResetParameters
+        markdown: contextResetParameters
       },
       {
         name: 'withParameters',
-        content: contextWithParameters
+        markdown: contextWithParameters
       }
     ]
   }]
