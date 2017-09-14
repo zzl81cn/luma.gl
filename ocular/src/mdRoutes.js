@@ -37,177 +37,259 @@ import contextGetParameters from '../../docs/api-reference/webgl/context-state/g
 import contextResetParameters from '../../docs/api-reference/webgl/context-state/reset-parameters.md';
 import contextWithParameters from '../../docs/api-reference/webgl/context-state/with-parameters.md';
 
+import README from '../../docs/README.md';
+import whatsNew from '../../docs/whats-new.md';
+import upgradeGuide from '../../docs/upgrade-guide.md';
+import getStarted from '../../docs/get-started/README.md';
+import installation from '../../docs/get-started/installation.md';
+import examples from '../../docs/get-started/examples.md';
+import usingWithDeckgl from '../../docs/get-started/using-with-deckgl.md';
+import usingWithNode from '../../docs/get-started/using-with-node.md';
+import debugging from '../../docs/get-started/debugging.md';
+
 export default [{
   name: 'Documentation',
   path: '/docs',
-  data: [{
-    name: 'API Reference',
-    children: [
-      {
-        name: 'Introduction',
-        markdown: apiReference
-      },
-      {
-        name: 'AnimationLoop',
-        markdown: animationLoop
-      },
-      {
-        name: 'Buffer',
-        markdown: buffer
-      },
-      {
-        name: 'Geometry',
-        markdown: geometry
-      },
-      // {
-      //   name: 'Group',
-      //   markdown: group
-      // },
-      {
-        name: 'Model',
-        markdown: model
-      },
-      {
-        name: 'Model:Cone',
-        markdown: cone
-      },
-      {
-        name: 'Model:Cube',
-        markdown: cube
-      },
-      {
-        name: 'Model:Cylinder',
-        markdown: cylinder
-      },
-      {
-        name: 'Model:IcoSphere',
-        markdown: icoSphere
-      },
-      {
-        name: 'Model:Plane',
-        markdown: plane
-      },
-      {
-        name: 'Model:Sphere',
-        markdown: sphere
-      },
-      // {
-      //   name: 'Object3d',
-      //  core/object-3d,
-      // },
-      // {
-      //   name: 'Picking',
-      //  picking/picking,
-      // },
-      {
-        name: 'Program',
-        markdown: program
-      },
-      {
-        name: 'Query',
-        markdown: query
-      },
-      {
-        name: 'Renderbuffer',
-        markdown: renderbuffer
-      },
-      {
-        name: 'Resource',
-        markdown: resource
-      },
-      {
-        name: 'Sampler',
-        markdown: sampler
-      },
-      {
-        name: 'Shader',
-        markdown: shader
-      },
-      {
-        name: 'ShaderCache',
-        markdown: shaderCache
-      },
-      {
-        name: 'Shader Modules',
-        markdown: shadertools
-      },
-      {
-        name: 'Shader Module:picking',
-        markdown: shadertoolsPicking
-      },
-      {
-        name: 'Texture',
-        markdown: texture
-      },
-      {
-        name: 'Texture2D',
-        markdown: texture2d
-      },
-      {
-        name: 'Texture2DArray',
-        markdown: texture2dArray
-      },
-      {
-        name: 'Texture3D',
-        markdown: texture3d
-      },
-      {
-        name: 'TextureCube',
-        markdown: textureCube
-      },
-      {
-        name: 'TransformFeedback',
-        markdown: transformFeedback
-      },
-      {
-        name: 'UniformBufferLayout',
-        markdown: uniformBufferLayout
-      },
-      {
-        name: 'VertexArray',
-        markdown: vertexArray
-      },
-      {
-        name: 'createGLContext',
-        markdown: context
-      },
-      {
-        name: 'isWebGL2',
-        markdown: contextIsWebGL2
-      },
-      {
-        name: 'hasFeature(s)',
-        markdown: contextHasFeatures
-      },
-      {
-        name: 'getFeatures',
-        markdown: contextGetFeatures
-      },
-      {
-        name: 'getContextInfo',
-        markdown: contextGetContextInfo
-      },
-      {
-        name: 'getContextLimits',
-        markdown: contextGetContextLimits
-      },
-      {
-        name: 'get|setParameter(s)',
-        markdown: contextGetParameters
-      },
-      {
-        name: 'resetParameters',
-        markdown: contextResetParameters
-      },
-      {
-        name: 'withParameters',
-        markdown: contextWithParameters
-      }
-    ]
-  }]
+  data: [
+    {
+      name: 'Overview',
+      children: [
+        {
+          name: 'Introduction',
+          markdown: README
+        },
+        {
+          name: 'What\'s New',
+          markdown: whatsNew
+        },
+        {
+          name: 'Upgrade Guide',
+          markdown: upgradeGuide
+        }
+      ]
+    },
+    {
+      name: 'Getting Started',
+      children: [
+        {
+          name: 'Overview',
+          markdown: getStarted
+        },
+        {
+          name: 'Installation',
+          markdown: installation
+        },
+        {
+          name: 'Examples',
+          markdown: examples
+        },
+        {
+          name: 'Using with deck.gl',
+          markdown: usingWithDeckgl
+        },
+        {
+          name: 'Using with Node.js',
+          markdown: usingWithNode
+        },
+        {
+          name: 'Debugging',
+          markdown: debugging
+        }
+        // {
+        //   name: 'Using with other Frameworks',
+        //   content: 'get-started/using-with-other-frameworks.md'
+        // }
+      ]
+    },
+    // ,
+    // {
+    //   name: 'Advanced',
+    //   children: [
+    //     {
+    //       name: 'Roadmap',
+    //       content: 'user-guide/extensions.md'
+    //     },
+    //     {
+    //       name: 'Extensions',
+    //       content: 'user-guide/extensions.md'
+    //     },
+    // {
+    //   name: 'WebGL2',
+    //   content: 'user-guide/webgl2.md'
+    // },
+    // {
+    //   name: 'GPGPU Programming',
+    //   content: 'user-guide/gpgpu.md'
+    // }
+    //   ]
+    // },
+    {
+      name: 'API Reference',
+      children: [
+        {
+          name: 'Introduction',
+          markdown: apiReference
+        },
+        {
+          name: 'AnimationLoop',
+          markdown: animationLoop
+        },
+        {
+          name: 'Buffer',
+          markdown: buffer
+        },
+        {
+          name: 'Geometry',
+          markdown: geometry
+        },
+        // {
+        //   name: 'Group',
+        //   markdown: group
+        // },
+        {
+          name: 'Model',
+          markdown: model
+        },
+        {
+          name: 'Model:Cone',
+          markdown: cone
+        },
+        {
+          name: 'Model:Cube',
+          markdown: cube
+        },
+        {
+          name: 'Model:Cylinder',
+          markdown: cylinder
+        },
+        {
+          name: 'Model:IcoSphere',
+          markdown: icoSphere
+        },
+        {
+          name: 'Model:Plane',
+          markdown: plane
+        },
+        {
+          name: 'Model:Sphere',
+          markdown: sphere
+        },
+        // {
+        //   name: 'Object3d',
+        //  core/object-3d,
+        // },
+        // {
+        //   name: 'Picking',
+        //  picking/picking,
+        // },
+        {
+          name: 'Program',
+          markdown: program
+        },
+        {
+          name: 'Query',
+          markdown: query
+        },
+        {
+          name: 'Renderbuffer',
+          markdown: renderbuffer
+        },
+        {
+          name: 'Resource',
+          markdown: resource
+        },
+        {
+          name: 'Sampler',
+          markdown: sampler
+        },
+        {
+          name: 'Shader',
+          markdown: shader
+        },
+        {
+          name: 'ShaderCache',
+          markdown: shaderCache
+        },
+        {
+          name: 'Shader Modules',
+          markdown: shadertools
+        },
+        {
+          name: 'Shader Module:picking',
+          markdown: shadertoolsPicking
+        },
+        {
+          name: 'Texture',
+          markdown: texture
+        },
+        {
+          name: 'Texture2D',
+          markdown: texture2d
+        },
+        {
+          name: 'Texture2DArray',
+          markdown: texture2dArray
+        },
+        {
+          name: 'Texture3D',
+          markdown: texture3d
+        },
+        {
+          name: 'TextureCube',
+          markdown: textureCube
+        },
+        {
+          name: 'TransformFeedback',
+          markdown: transformFeedback
+        },
+        {
+          name: 'UniformBufferLayout',
+          markdown: uniformBufferLayout
+        },
+        {
+          name: 'VertexArray',
+          markdown: vertexArray
+        },
+        {
+          name: 'createGLContext',
+          markdown: context
+        },
+        {
+          name: 'isWebGL2',
+          markdown: contextIsWebGL2
+        },
+        {
+          name: 'hasFeature(s)',
+          markdown: contextHasFeatures
+        },
+        {
+          name: 'getFeatures',
+          markdown: contextGetFeatures
+        },
+        {
+          name: 'getContextInfo',
+          markdown: contextGetContextInfo
+        },
+        {
+          name: 'getContextLimits',
+          markdown: contextGetContextLimits
+        },
+        {
+          name: 'get|setParameter(s)',
+          markdown: contextGetParameters
+        },
+        {
+          name: 'resetParameters',
+          markdown: contextResetParameters
+        },
+        {
+          name: 'withParameters',
+          markdown: contextWithParameters
+        }
+      ]
+    }
+  ]
 }];
-
-/*
 
 const GITHUB_TREE = 'https://github.com/uber/luma.gl/tree/master';
 const RAW_GITHUB = 'https://raw.githubusercontent.com/uber/luma.gl/master';
@@ -415,78 +497,3 @@ export const EXAMPLE_PAGES = [
     ]
   }
 ];
-
-export const DOC_PAGES = [
-  {
-    name: 'Overview',
-    children: [
-      {
-        name: 'Introduction',
-        content: 'README.md'
-      },
-      {
-        name: 'What\'s New',
-        content: 'whats-new.md'
-      },
-      {
-        name: 'Upgrade Guide',
-        content: 'upgrade-guide.md'
-      }
-    ]
-  },
-  {
-    name: 'Getting Started',
-    children: [
-      {
-        name: 'Overview',
-        content: 'get-started/README.md'
-      },
-      {
-        name: 'Installation',
-        content: 'get-started/installation.md'
-      },
-      {
-        name: 'Examples',
-        content: 'get-started/examples.md'
-      },
-      {
-        name: 'Using with deck.gl',
-        content: 'get-started/using-with-deckgl.md'
-      },
-      {
-        name: 'Using with Node.js',
-        content: 'get-started/using-with-node.md'
-      },
-      {
-        name: 'Debugging',
-        content: 'get-started/debugging.md'
-      }
-      // {
-      //   name: 'Using with other Frameworks',
-      //   content: 'get-started/using-with-other-frameworks.md'
-      // }
-    ]
-  },
-  // ,
-  // {
-  //   name: 'Advanced',
-  //   children: [
-  //     {
-  //       name: 'Roadmap',
-  //       content: 'user-guide/extensions.md'
-  //     },
-  //     {
-  //       name: 'Extensions',
-  //       content: 'user-guide/extensions.md'
-  //     },
-      // {
-      //   name: 'WebGL2',
-      //   content: 'user-guide/webgl2.md'
-      // },
-      // {
-      //   name: 'GPGPU Programming',
-      //   content: 'user-guide/gpgpu.md'
-      // }
-  //   ]
-  // }
-*/
