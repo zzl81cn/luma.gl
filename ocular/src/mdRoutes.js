@@ -47,30 +47,32 @@ import usingWithDeckgl from '../../docs/get-started/using-with-deckgl.md';
 import usingWithNode from '../../docs/get-started/using-with-node.md';
 import debugging from '../../docs/get-started/debugging.md';
 
-import {default as InstancingDemo} from '../../examples/core/instancing/app.js';
-import {default as CubemapDemo} from '../../examples/core/cubemap/app.js';
-// import {default as CustomPickingDemo} from '../../examples/core/custom-picking/app.js';
-// import {default as DeferredRenderingDemo} from '../../examples/core/deferred-rendering/app.js';
-import {default as MandelbrotDemo} from '../../examples/core/mandelbrot/app.js';
-import {default as FragmentDemo} from '../../examples/core/fragment/app.js';
-// import {default as ParticlesDemo} from '../../examples/core/particles/app.js';
-// import {default as PersistenceDemo} from '../../examples/core/persistence/app.js';
-import {default as PickingDemo} from '../../examples/core/picking/app.js';
-import {default as ShadowmapDemo} from '../../examples/core/shadowmap/src/app.js';
-import {default as TransformFeedbackDemo} from '../../examples/core/transform-feedback/app.js';
+import {
+  InstancingDemo,
+  CubemapDemo,
+  //  CustomPickingDemo,
+  //  DeferredRenderingDemo,
+  MandelbrotDemo,
+  FragmentDemo,
+  //  ParticlesDemo,
+  //  PersistenceDemo,
+  PickingDemo,
+  ShadowmapDemo,
+  TransformFeedbackDemo,
 
-import {default as Lesson01} from '../../examples/lessons/01/app.js';
-import {default as Lesson02} from '../../examples/lessons/02/app.js';
-import {default as Lesson03} from '../../examples/lessons/03/app.js';
-import {default as Lesson04} from '../../examples/lessons/04/app.js';
-import {default as Lesson05} from '../../examples/lessons/05/app.js';
-import {default as Lesson06} from '../../examples/lessons/06/app.js';
-import {default as Lesson07} from '../../examples/lessons/07/app.js';
-import {default as Lesson08} from '../../examples/lessons/08/app.js';
-import {default as Lesson09} from '../../examples/lessons/09/app.js';
-import {default as Lesson10} from '../../examples/lessons/10/app.js';
-import {default as Lesson11} from '../../examples/lessons/11/app.js';
-import {default as Lesson16} from '../../examples/lessons/16/app.js';
+  Lesson01,
+  Lesson02,
+  Lesson03,
+  Lesson04,
+  Lesson05,
+  Lesson06,
+  Lesson07,
+  Lesson08,
+  Lesson09,
+  Lesson10,
+  Lesson11,
+  Lesson16
+} from './react-demos';
 
 export default [
   {
@@ -120,7 +122,7 @@ export default [
           name: 'Transform Feedback',
           component: TransformFeedbackDemo
         }
-      ],
+      ]
     }, {
       name: 'WebGL Lessons',
       children: [
