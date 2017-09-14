@@ -60,18 +60,18 @@ import {
   ShadowmapDemo,
   TransformFeedbackDemo,
 
-  Lesson01,
-  Lesson02,
-  Lesson03,
-  Lesson04,
-  Lesson05,
-  Lesson06,
-  Lesson07,
-  Lesson08,
-  Lesson09,
-  Lesson10,
-  Lesson11,
-  Lesson16
+  Lesson01Demo,
+  Lesson02Demo,
+  Lesson03Demo,
+  Lesson04Demo,
+  Lesson05Demo,
+  Lesson06Demo,
+  Lesson07Demo,
+  Lesson08Demo,
+  Lesson09Demo,
+  Lesson10Demo,
+  Lesson11Demo,
+  Lesson16Demo
 } from './react-demos';
 
 export default [
@@ -128,47 +128,47 @@ export default [
       children: [
         {
           name: 'Lesson 01 - Drawing',
-          component: Lesson01
+          component: Lesson01Demo
         },
         {
           name: 'Lesson 02 - Color',
-          component: Lesson02
+          component: Lesson02Demo
         },
         {
           name: 'Lesson 03 - Movement',
-          component: Lesson03
+          component: Lesson03Demo
         },
         {
           name: 'Lesson 04 - 3D Objects',
-          component: Lesson04
+          component: Lesson04Demo
         },
         {
           name: 'Lesson 05 - Textures',
-          component: Lesson05
+          component: Lesson05Demo
         },
         {
           name: 'Lesson 06 - Texture Filters',
-          component: Lesson06
+          component: Lesson06Demo
         },
         {
           name: 'Lesson 07 - Lighting',
-          component: Lesson07
+          component: Lesson07Demo
         },
         {
           name: 'Lesson 08 - Transparency',
-          component: Lesson08
+          component: Lesson08Demo
         },
         {
           name: 'Lesson 09 - Moving Objects',
-          component: Lesson09
+          component: Lesson09Demo
         },
         {
           name: 'Lesson 10',
-          component: Lesson10
+          component: Lesson10Demo
         },
         {
           name: 'Lesson 11',
-          component: Lesson11
+          component: Lesson11Demo
         },
         // {
         //   name: 'Lesson 12',
@@ -184,7 +184,7 @@ export default [
         // component: 'Lesson15
         {
           name: 'Lesson 16 - Render to Texture',
-          component: Lesson16
+          component: Lesson16Demo
         }
       ]
     }]

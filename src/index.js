@@ -96,18 +96,6 @@ export {default as TruncatedCone} from './models/truncated-cone';
 
 export {default as ClipSpaceQuad} from './models/clip-space-quad';
 
-// Math
-export {
-  radians,
-  degrees} from './packages/math/src/common';
-export {default as Vector2} from './packages/math/src/vector2';
-export {default as Vector3} from './packages/math/src/vector3';
-export {default as Vector4} from './packages/math/src/vector4';
-export {default as Matrix4} from './packages/math/src/matrix4';
-export {default as Quaternion} from './packages/math/src/quaternion';
-export {default as Euler} from './packages/math/src/euler';
-export {default as SphericalCoordinates} from './packages/math/src/spherical-coordinates';
-
 // IO
 export {
   setPathPrefix,
@@ -147,6 +135,20 @@ export const experimental = {
 };
 
 // DEPRECATED EXPORTS
+
+// Forward broken out math exports
+export {
+  radians,
+  degrees,
+  Vector2,
+  Vector3,
+  Vector4,
+  Matrix4,
+  Quaternion,
+  Euler,
+  SphericalCoordinates
+} from 'math.gl';
+
 // Alias for FramebufferObject (deprecated in v3). Framebuffer API is fairly similar
 export {default as FramebufferObject} from './webgl/framebuffer';
 export {default as Scene} from './deprecated/scene';

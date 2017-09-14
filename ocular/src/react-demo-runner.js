@@ -1,4 +1,4 @@
-import {Component} from 'react';
+import React, {Component} from 'react'; // eslint-disable-line
 import PropTypes from 'prop-types';
 
 const propTypes = {
@@ -14,8 +14,8 @@ export default class DemoRunner extends Component {
 
   componentDidMount() {
     this.props.demo.start({
-      canvas: this.props.canvas
-      // debug: true
+      canvas: this.props.canvas,
+      debug: true
     });
   }
 
@@ -26,7 +26,11 @@ export default class DemoRunner extends Component {
   render() {
     const {width, height} = this.props;
     return (
-      <canvas id={this.props.canvas} style={{width, height, padding: 0, border: 0}}/>
+      <div style={{width, height, padding: 0, border: 0}}>
+        <canvas
+          id={this.props.canvas}
+          style={{width: '100%', height: '100%', padding: 0, border: 0}}/>
+      </div>
     );
   }
 

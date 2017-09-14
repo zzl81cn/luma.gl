@@ -32,29 +32,54 @@ import React from 'react';
 import Demo from './react-demo-runner';
 /* eslint-enable */
 
-export default {
-  InstancingDemo: props => (<Demo {...props} demo={Instancing}/>),
-  CubemapDemo: props => (<Demo {...props} demo={Cubemap}/>),
-  // CustomPickingDemo: props => (<Demo {...props} demo={CustomPicking}/>),
-  // DeferredRenderingDemo: props => (<Demo {...props} demo={DeferredRendering/>),
-  MandelbrotDemo: props => (<Demo {...props} demo={Mandelbrot}/>),
-  FragmentDemo: props => (<Demo {...props} demo={Fragment}/>),
-  // ParticlesDemo: props => (<Demo {...props} demo={Particles}/>),
-  // PersistenceDemo: props => (<Demo {...props} demo={Persistence}/>),
-  PickingDemo: props => (<Demo {...props} demo={Picking}/>),
-  ShadowmapDemo: props => (<Demo {...props} demo={Shadowmap}/>),
-  TransformFeedbackDemo: props => (<Demo {...props} demo={TransformFeedback}/>),
+const InstancingDemo = props => (<Demo {...props} demo={Instancing}/>);
+const CubemapDemo = props => (<Demo {...props} demo={Cubemap}/>);
+// const CustomPickingDemo = props => (<Demo {...props} demo={CustomPicking}/>);
+// const DeferredRenderingDemo = props => (<Demo {...props} demo={DeferredRendering/>);
+const MandelbrotDemo = props => (<Demo {...props} demo={Mandelbrot}/>);
+const FragmentDemo = props => (<Demo {...props} demo={Fragment}/>);
+// const ParticlesDemo = props => (<Demo {...props} demo={Particles}/>);
+// const PersistenceDemo = props => (<Demo {...props} demo={Persistence}/>);
+const PickingDemo = props => (<Demo {...props} demo={Picking}/>);
+const ShadowmapDemo = props => (<Demo {...props} demo={Shadowmap}/>);
+const TransformFeedbackDemo = props => (<Demo {...props} demo={TransformFeedback}/>);
 
-  Lesson01: props => (<Demo {...props} demo={Lesson01}/>),
-  Lesson02: props => (<Demo {...props} demo={Lesson02}/>),
-  Lesson03: props => (<Demo {...props} demo={Lesson03}/>),
-  Lesson04: props => (<Demo {...props} demo={Lesson04}/>),
-  Lesson05: props => (<Demo {...props} demo={Lesson05}/>),
-  Lesson06: props => (<Demo {...props} demo={Lesson06}/>),
-  Lesson07: props => (<Demo {...props} demo={Lesson07}/>),
-  Lesson08: props => (<Demo {...props} demo={Lesson08}/>),
-  Lesson09: props => (<Demo {...props} demo={Lesson09}/>),
-  Lesson10: props => (<Demo {...props} demo={Lesson10}/>),
-  Lesson11: props => (<Demo {...props} demo={Lesson11}/>),
-  Lesson16: props => (<Demo {...props} demo={Lesson16}/>)
+const Lesson01Demo = props => (<Demo {...props} demo={Lesson01}/>);
+const Lesson02Demo = props => (<Demo {...props} demo={Lesson02}/>);
+const Lesson03Demo = props => (<Demo {...props} demo={Lesson03}/>);
+const Lesson04Demo = props => (<Demo {...props} demo={Lesson04}/>);
+const Lesson05Demo = props => (<Demo {...props} demo={Lesson05}/>);
+const Lesson06Demo = props => (<Demo {...props} demo={Lesson06}/>);
+const Lesson07Demo = props => (<Demo {...props} demo={Lesson07}/>);
+const Lesson08Demo = props => (<Demo {...props} demo={Lesson08}/>);
+const Lesson09Demo = props => (<Demo {...props} demo={Lesson09}/>);
+const Lesson10Demo = props => (<Demo {...props} demo={Lesson10}/>);
+const Lesson11Demo = props => (<Demo {...props} demo={Lesson11}/>);
+const Lesson16Demo = props => (<Demo {...props} demo={Lesson16}/>);
+
+export {
+  InstancingDemo,
+  CubemapDemo,
+  // CustomPickingDemo,
+  // DeferredRenderingDemo,
+  MandelbrotDemo,
+  FragmentDemo,
+  // ParticlesDemo,
+  // PersistenceDemo,
+  PickingDemo,
+  ShadowmapDemo,
+  TransformFeedbackDemo,
+
+  Lesson01Demo,
+  Lesson02Demo,
+  Lesson03Demo,
+  Lesson04Demo,
+  Lesson05Demo,
+  Lesson06Demo,
+  Lesson07Demo,
+  Lesson08Demo,
+  Lesson09Demo,
+  Lesson10Demo,
+  Lesson11Demo,
+  Lesson16Demo
 };

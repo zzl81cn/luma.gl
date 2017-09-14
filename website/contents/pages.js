@@ -334,24 +334,8 @@ export const DOC_PAGES = [
       //   content: 'api-reference/core/group.md'
       // },
       {
-        name: 'Math',
+        name: 'math.gl',
         content: 'api-reference/math/README.md'
-      },
-      {
-        name: 'Math:Euler',
-        content: 'api-reference/math/euler.md'
-      },
-      {
-        name: 'Math:Matrix4',
-        content: 'api-reference/math/matrix4.md'
-      },
-      {
-        name: 'Math:Quaternion',
-        content: 'api-reference/math/quaternion.md'
-      },
-      {
-        name: 'Math:Vector Classes',
-        content: 'api-reference/math/vector.md'
       },
       {
         name: 'Model',

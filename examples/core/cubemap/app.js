@@ -1,5 +1,6 @@
 /* global document */
-import {AnimationLoop, GL, TextureCube, Cube, Matrix4, radians, setParameters} from 'luma.gl';
+import {AnimationLoop, GL, TextureCube, Cube, setParameters} from 'luma.gl';
+import {Matrix4, radians} from 'math.gl';
 
 const animationLoop = new AnimationLoop({
   onInitialize: ({gl, canvas}) => {
