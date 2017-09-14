@@ -12,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "ocular": "^0.1.15"
+    "ocular": "^0.2.4"
+  },
+  "dependencies": {
+    "math.gl": ">=1.0.0-alpha.7"
   }
 }

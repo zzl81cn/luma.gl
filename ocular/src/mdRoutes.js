@@ -47,452 +47,385 @@ import usingWithDeckgl from '../../docs/get-started/using-with-deckgl.md';
 import usingWithNode from '../../docs/get-started/using-with-node.md';
 import debugging from '../../docs/get-started/debugging.md';
 
-export default [{
-  name: 'Documentation',
-  path: '/docs',
-  data: [
-    {
-      name: 'Overview',
-      children: [
-        {
-          name: 'Introduction',
-          markdown: README
-        },
-        {
-          name: 'What\'s New',
-          markdown: whatsNew
-        },
-        {
-          name: 'Upgrade Guide',
-          markdown: upgradeGuide
-        }
-      ]
-    },
-    {
-      name: 'Getting Started',
-      children: [
-        {
-          name: 'Overview',
-          markdown: getStarted
-        },
-        {
-          name: 'Installation',
-          markdown: installation
-        },
-        {
-          name: 'Examples',
-          markdown: examples
-        },
-        {
-          name: 'Using with deck.gl',
-          markdown: usingWithDeckgl
-        },
-        {
-          name: 'Using with Node.js',
-          markdown: usingWithNode
-        },
-        {
-          name: 'Debugging',
-          markdown: debugging
-        }
-        // {
-        //   name: 'Using with other Frameworks',
-        //   content: 'get-started/using-with-other-frameworks.md'
-        // }
-      ]
-    },
-    // ,
-    // {
-    //   name: 'Advanced',
-    //   children: [
-    //     {
-    //       name: 'Roadmap',
-    //       content: 'user-guide/extensions.md'
-    //     },
-    //     {
-    //       name: 'Extensions',
-    //       content: 'user-guide/extensions.md'
-    //     },
-    // {
-    //   name: 'WebGL2',
-    //   content: 'user-guide/webgl2.md'
-    // },
-    // {
-    //   name: 'GPGPU Programming',
-    //   content: 'user-guide/gpgpu.md'
-    // }
-    //   ]
-    // },
-    {
-      name: 'API Reference',
-      children: [
-        {
-          name: 'Introduction',
-          markdown: apiReference
-        },
-        {
-          name: 'AnimationLoop',
-          markdown: animationLoop
-        },
-        {
-          name: 'Buffer',
-          markdown: buffer
-        },
-        {
-          name: 'Geometry',
-          markdown: geometry
-        },
-        // {
-        //   name: 'Group',
-        //   markdown: group
-        // },
-        {
-          name: 'Model',
-          markdown: model
-        },
-        {
-          name: 'Model:Cone',
-          markdown: cone
-        },
-        {
-          name: 'Model:Cube',
-          markdown: cube
-        },
-        {
-          name: 'Model:Cylinder',
-          markdown: cylinder
-        },
-        {
-          name: 'Model:IcoSphere',
-          markdown: icoSphere
-        },
-        {
-          name: 'Model:Plane',
-          markdown: plane
-        },
-        {
-          name: 'Model:Sphere',
-          markdown: sphere
-        },
-        // {
-        //   name: 'Object3d',
-        //  core/object-3d,
-        // },
-        // {
-        //   name: 'Picking',
-        //  picking/picking,
-        // },
-        {
-          name: 'Program',
-          markdown: program
-        },
-        {
-          name: 'Query',
-          markdown: query
-        },
-        {
-          name: 'Renderbuffer',
-          markdown: renderbuffer
-        },
-        {
-          name: 'Resource',
-          markdown: resource
-        },
-        {
-          name: 'Sampler',
-          markdown: sampler
-        },
-        {
-          name: 'Shader',
-          markdown: shader
-        },
-        {
-          name: 'ShaderCache',
-          markdown: shaderCache
-        },
-        {
-          name: 'Shader Modules',
-          markdown: shadertools
-        },
-        {
-          name: 'Shader Module:picking',
-          markdown: shadertoolsPicking
-        },
-        {
-          name: 'Texture',
-          markdown: texture
-        },
-        {
-          name: 'Texture2D',
-          markdown: texture2d
-        },
-        {
-          name: 'Texture2DArray',
-          markdown: texture2dArray
-        },
-        {
-          name: 'Texture3D',
-          markdown: texture3d
-        },
-        {
-          name: 'TextureCube',
-          markdown: textureCube
-        },
-        {
-          name: 'TransformFeedback',
-          markdown: transformFeedback
-        },
-        {
-          name: 'UniformBufferLayout',
-          markdown: uniformBufferLayout
-        },
-        {
-          name: 'VertexArray',
-          markdown: vertexArray
-        },
-        {
-          name: 'createGLContext',
-          markdown: context
-        },
-        {
-          name: 'isWebGL2',
-          markdown: contextIsWebGL2
-        },
-        {
-          name: 'hasFeature(s)',
-          markdown: contextHasFeatures
-        },
-        {
-          name: 'getFeatures',
-          markdown: contextGetFeatures
-        },
-        {
-          name: 'getContextInfo',
-          markdown: contextGetContextInfo
-        },
-        {
-          name: 'getContextLimits',
-          markdown: contextGetContextLimits
-        },
-        {
-          name: 'get|setParameter(s)',
-          markdown: contextGetParameters
-        },
-        {
-          name: 'resetParameters',
-          markdown: contextResetParameters
-        },
-        {
-          name: 'withParameters',
-          markdown: contextWithParameters
-        }
-      ]
-    }
-  ]
-}];
+import {default as InstancingDemo} from '../../examples/core/instancing/app.js';
+import {default as CubemapDemo} from '../../examples/core/cubemap/app.js';
+// import {default as CustomPickingDemo} from '../../examples/core/custom-picking/app.js';
+// import {default as DeferredRenderingDemo} from '../../examples/core/deferred-rendering/app.js';
+import {default as MandelbrotDemo} from '../../examples/core/mandelbrot/app.js';
+import {default as FragmentDemo} from '../../examples/core/fragment/app.js';
+// import {default as ParticlesDemo} from '../../examples/core/particles/app.js';
+// import {default as PersistenceDemo} from '../../examples/core/persistence/app.js';
+import {default as PickingDemo} from '../../examples/core/picking/app.js';
+import {default as ShadowmapDemo} from '../../examples/core/shadowmap/src/app.js';
+import {default as TransformFeedbackDemo} from '../../examples/core/transform-feedback/app.js';
 
-const GITHUB_TREE = 'https://github.com/uber/luma.gl/tree/master';
-const RAW_GITHUB = 'https://raw.githubusercontent.com/uber/luma.gl/master';
+import {default as Lesson01} from '../../examples/lessons/01/app.js';
+import {default as Lesson02} from '../../examples/lessons/02/app.js';
+import {default as Lesson03} from '../../examples/lessons/03/app.js';
+import {default as Lesson04} from '../../examples/lessons/04/app.js';
+import {default as Lesson05} from '../../examples/lessons/05/app.js';
+import {default as Lesson06} from '../../examples/lessons/06/app.js';
+import {default as Lesson07} from '../../examples/lessons/07/app.js';
+import {default as Lesson08} from '../../examples/lessons/08/app.js';
+import {default as Lesson09} from '../../examples/lessons/09/app.js';
+import {default as Lesson10} from '../../examples/lessons/10/app.js';
+import {default as Lesson11} from '../../examples/lessons/11/app.js';
+import {default as Lesson16} from '../../examples/lessons/16/app.js';
 
-export const EXAMPLE_PAGES = [
+export default [
   {
-    name: 'Overview',
-    content: 'markdown/examples.md'
-  },
-  {
-    name: 'Core Examples',
-    children: [
-      {
-        name: 'Cubemap',
-        content: {
-          demo: 'CubemapDemo',
-          code: `${GITHUB_TREE}/examples/core/cubemap`
+    name: 'Examples',
+    path: '/examples',
+    data: [{
+      name: 'Showcases',
+      children: [
+        {
+          name: 'Cubemap',
+          component: CubemapDemo
+        },
+        // {
+        //   name: 'Custom Picking',
+        //   component: CustomPicking,
+        // },
+        {
+          name: 'Fragment',
+          component: FragmentDemo
+        },
+        {
+          name: 'Instancing',
+          component: InstancingDemo
+        },
+        {
+          name: 'Mandelbrot',
+          component: MandelbrotDemo
+        },
+        {
+          name: 'Picking',
+          component: PickingDemo
+        },
+        // {
+        //   name: 'DeferredRendering',
+        // component: DeferredRendering,
+        // {
+        //   name: 'Particles',
+        // component: Particles,
+        // {
+        //   name: 'Persistence',
+        // component: Persistence,
+        {
+          name: 'Shadowmap',
+          component: ShadowmapDemo
+        },
+        {
+          name: 'Transform Feedback',
+          component: TransformFeedbackDemo
         }
+      ],
+    }, {
+      name: 'WebGL Lessons',
+      children: [
+        {
+          name: 'Lesson 01 - Drawing',
+          component: Lesson01
+        },
+        {
+          name: 'Lesson 02 - Color',
+          component: Lesson02
+        },
+        {
+          name: 'Lesson 03 - Movement',
+          component: Lesson03
+        },
+        {
+          name: 'Lesson 04 - 3D Objects',
+          component: Lesson04
+        },
+        {
+          name: 'Lesson 05 - Textures',
+          component: Lesson05
+        },
+        {
+          name: 'Lesson 06 - Texture Filters',
+          component: Lesson06
+        },
+        {
+          name: 'Lesson 07 - Lighting',
+          component: Lesson07
+        },
+        {
+          name: 'Lesson 08 - Transparency',
+          component: Lesson08
+        },
+        {
+          name: 'Lesson 09 - Moving Objects',
+          component: Lesson09
+        },
+        {
+          name: 'Lesson 10',
+          component: Lesson10
+        },
+        {
+          name: 'Lesson 11',
+          component: Lesson11
+        },
+        // {
+        //   name: 'Lesson 12',
+        // component: 'Lesson12,
+        // {
+        //   name: 'Lesson 13',
+        // component: 'Lesson13,
+        // {
+        //   name: 'Lesson 14',
+        // component: 'Lesson14,
+        // {
+        //   name: 'Lesson 15',
+        // component: 'Lesson15
+        {
+          name: 'Lesson 16 - Render to Texture',
+          component: Lesson16
+        }
+      ]
+    }]
+  }, {
+    name: 'Documentation',
+    path: '/docs',
+    data: [
+      {
+        name: 'Overview',
+        children: [
+          {
+            name: 'Introduction',
+            markdown: README
+          },
+          {
+            name: 'What\'s New',
+            markdown: whatsNew
+          },
+          {
+            name: 'Upgrade Guide',
+            markdown: upgradeGuide
+          }
+        ]
       },
+      {
+        name: 'Getting Started',
+        children: [
+          {
+            name: 'Overview',
+            markdown: getStarted
+          },
+          {
+            name: 'Installation',
+            markdown: installation
+          },
+          {
+            name: 'Examples',
+            markdown: examples
+          },
+          {
+            name: 'Using with deck.gl',
+            markdown: usingWithDeckgl
+          },
+          {
+            name: 'Using with Node.js',
+            markdown: usingWithNode
+          },
+          {
+            name: 'Debugging',
+            markdown: debugging
+          }
+          // {
+          //   name: 'Using with other Frameworks',
+          //   content: 'get-started/using-with-other-frameworks.md'
+          // }
+        ]
+      },
+      // ,
       // {
-      //   name: 'Custom Picking',
-      //   content: {
-      //     demo: 'CustomPickingDemo',
-      //     path: `${GITHUB_TREE}/examples/core/custom-picking/`
-      //   }
-      // },
-      {
-        name: 'Fragment',
-        content: {
-          demo: 'FragmentDemo',
-          code: `${GITHUB_TREE}/examples/core/fragment`
-        }
-      },
-      {
-        name: 'Instancing',
-        content: {
-          demo: 'InstancingDemo',
-          code: `${GITHUB_TREE}/examples/core/instancing`
-        }
-      },
-      {
-        name: 'Mandelbrot',
-        content: {
-          demo: 'MandelbrotDemo',
-          code: `${GITHUB_TREE}/examples/core/mandelbrot`
-        }
-      },
-      {
-        name: 'Picking',
-        content: {
-          demo: 'PickingDemo',
-          code: `${GITHUB_TREE}/examples/core/picking`,
-          path: `${RAW_GITHUB}/examples/core/picking/`
-        }
-      },
+      //   name: 'Advanced',
+      //   children: [
+      //     {
+      //       name: 'Roadmap',
+      //       content: 'user-guide/extensions.md'
+      //     },
+      //     {
+      //       name: 'Extensions',
+      //       content: 'user-guide/extensions.md'
+      //     },
       // {
-      //   name: 'DeferredRendering',
-      //   content: {
-      //     demo: 'DeferredRenderingDemo'
-      //   }
-      // },
-      // {
-      //   name: 'Particles',
-      //   content: {
-      //     demo: 'ParticlesDemo'
-      //   }
-      // },
-      // {
-      //   name: 'Persistence',
-      //   content: {
-      //     demo: 'PersistenceDemo'
-      //   }
-      // },
-      {
-        name: 'Shadowmap',
-        content: {
-          demo: 'ShadowmapDemo',
-          code: `${GITHUB_TREE}/examples/core/shadowmap`
-        }
-      },
-      {
-        name: 'Transform Feedback',
-        content: {
-          demo: 'TransformFeedbackDemo',
-          code: `${GITHUB_TREE}/examples/core/transform-feedback`
-        }
-      }
-    ]
-  },
-  {
-    name: 'WebGL Lessons',
-    children: [
-      {
-        name: 'Lesson 01 - Drawing',
-        content: {
-          demo: 'Lesson01',
-          code: `${GITHUB_TREE}/examples/lessons/01`
-        }
-      },
-      {
-        name: 'Lesson 02 - Color',
-        content: {
-          demo: 'Lesson02',
-          code: `${GITHUB_TREE}/examples/lessons/02`
-        }
-      },
-      {
-        name: 'Lesson 03 - Movement',
-        content: {
-          demo: 'Lesson03',
-          code: `${GITHUB_TREE}/examples/lessons/03`
-        }
-      },
-      {
-        name: 'Lesson 04 - 3D Objects',
-        content: {
-          demo: 'Lesson04',
-          code: `${GITHUB_TREE}/examples/lessons/04`
-        }
-      },
-      {
-        name: 'Lesson 05 - Textures',
-        content: {
-          demo: 'Lesson05',
-          code: `${GITHUB_TREE}/examples/lessons/05`,
-          path: `${RAW_GITHUB}/examples/lessons/05/`
-        }
-      },
-      {
-        name: 'Lesson 06 - Texture Filters',
-        content: {
-          demo: 'Lesson06',
-          code: `${GITHUB_TREE}/examples/lessons/06/`,
-          path: `${RAW_GITHUB}/examples/lessons/06/`
-        }
-      },
-      {
-        name: 'Lesson 07 - Lighting',
-        content: {
-          demo: 'Lesson07',
-          code: `${GITHUB_TREE}/examples/lessons/07/`,
-          path: `${RAW_GITHUB}/examples/lessons/07/`
-        }
-      },
-      {
-        name: 'Lesson 08 - Transparency',
-        content: {
-          demo: 'Lesson08',
-          code: `${GITHUB_TREE}/examples/lessons/08/`,
-          path: `${RAW_GITHUB}/examples/lessons/08/`
-        }
-      },
-      {
-        name: 'Lesson 09 - Moving Objects',
-        content: {
-          demo: 'Lesson09',
-          code: `${GITHUB_TREE}/examples/lessons/09/`,
-          path: `${RAW_GITHUB}/examples/lessons/09/`
-        }
-      },
-      // {
-      //   name: 'Lesson 10',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
-      // },
-      // {
-      //   name: 'Lesson 11',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
-      // },
-      // {
-      //   name: 'Lesson 12',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
-      // },
-      // {
-      //   name: 'Lesson 13',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
-      // },
-      // {
-      //   name: 'Lesson 14',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
+      //   name: 'WebGL2',
+      //   content: 'user-guide/webgl2.md'
       // },
       // {
-      //   name: 'Lesson 15',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
+      //   name: 'GPGPU Programming',
+      //   content: 'user-guide/gpgpu.md'
+      // }
+      //   ]
       // },
       {
-        name: 'Lesson 16 - Render to Texture',
-        content: {
-          demo: 'Lesson16',
-          code: `${GITHUB_TREE}/examples/lessons/16/`,
-          path: `${RAW_GITHUB}/examples/lessons/16/`
-        }
+        name: 'API Reference',
+        children: [
+          {
+            name: 'Introduction',
+            markdown: apiReference
+          },
+          {
+            name: 'AnimationLoop',
+            markdown: animationLoop
+          },
+          {
+            name: 'Buffer',
+            markdown: buffer
+          },
+          {
+            name: 'Geometry',
+            markdown: geometry
+          },
+          // {
+          //   name: 'Group',
+          //   markdown: group
+          // },
+          {
+            name: 'Model',
+            markdown: model
+          },
+          {
+            name: 'Model:Cone',
+            markdown: cone
+          },
+          {
+            name: 'Model:Cube',
+            markdown: cube
+          },
+          {
+            name: 'Model:Cylinder',
+            markdown: cylinder
+          },
+          {
+            name: 'Model:IcoSphere',
+            markdown: icoSphere
+          },
+          {
+            name: 'Model:Plane',
+            markdown: plane
+          },
+          {
+            name: 'Model:Sphere',
+            markdown: sphere
+          },
+          // {
+          //   name: 'Object3d',
+          //  core/object-3d,
+          // },
+          // {
+          //   name: 'Picking',
+          //  picking/picking,
+          // },
+          {
+            name: 'Program',
+            markdown: program
+          },
+          {
+            name: 'Query',
+            markdown: query
+          },
+          {
+            name: 'Renderbuffer',
+            markdown: renderbuffer
+          },
+          {
+            name: 'Resource',
+            markdown: resource
+          },
+          {
+            name: 'Sampler',
+            markdown: sampler
+          },
+          {
+            name: 'Shader',
+            markdown: shader
+          },
+          {
+            name: 'ShaderCache',
+            markdown: shaderCache
+          },
+          {
+            name: 'Shader Modules',
+            markdown: shadertools
+          },
+          {
+            name: 'Shader Module:picking',
+            markdown: shadertoolsPicking
+          },
+          {
+            name: 'Texture',
+            markdown: texture
+          },
+          {
+            name: 'Texture2D',
+            markdown: texture2d
+          },
+          {
+            name: 'Texture2DArray',
+            markdown: texture2dArray
+          },
+          {
+            name: 'Texture3D',
+            markdown: texture3d
+          },
+          {
+            name: 'TextureCube',
+            markdown: textureCube
+          },
+          {
+            name: 'TransformFeedback',
+            markdown: transformFeedback
+          },
+          {
+            name: 'UniformBufferLayout',
+            markdown: uniformBufferLayout
+          },
+          {
+            name: 'VertexArray',
+            markdown: vertexArray
+          },
+          {
+            name: 'createGLContext',
+            markdown: context
+          },
+          {
+            name: 'isWebGL2',
+            markdown: contextIsWebGL2
+          },
+          {
+            name: 'hasFeature(s)',
+            markdown: contextHasFeatures
+          },
+          {
+            name: 'getFeatures',
+            markdown: contextGetFeatures
+          },
+          {
+            name: 'getContextInfo',
+            markdown: contextGetContextInfo
+          },
+          {
+            name: 'getContextLimits',
+            markdown: contextGetContextLimits
+          },
+          {
+            name: 'get|setParameter(s)',
+            markdown: contextGetParameters
+          },
+          {
+            name: 'resetParameters',
+            markdown: contextResetParameters
+          },
+          {
+            name: 'withParameters',
+            markdown: contextWithParameters
+          }
+        ]
       }
     ]
   }

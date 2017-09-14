@@ -1,210 +1,82 @@
-export default {};
+import {setContextDefaults} from 'luma.gl';
+setContextDefaults({webgl2: true});
 
 /*
-const GITHUB_TREE = 'https://github.com/uber/luma.gl/tree/master';
-const RAW_GITHUB = 'https://raw.githubusercontent.com/uber/luma.gl/master';
+export {default as InstancingDemo} from '../../examples/core/instancing/app.js';
+export {default as CubemapDemo} from '../../examples/core/cubemap/app.js';
+// export {default as CustomPickingDemo} from '../../examples/core/custom-picking/app.js';
+// export {default as DeferredRenderingDemo} from '../../examples/core/deferred-rendering/app.js';
+export {default as MandelbrotDemo} from '../../examples/core/mandelbrot/app.js';
+export {default as FragmentDemo} from '../../examples/core/fragment/app.js';
+// export {default as ParticlesDemo} from '../../examples/core/particles/app.js';
+// export {default as PersistenceDemo} from '../../examples/core/persistence/app.js';
+export {default as PickingDemo} from '../../examples/core/picking/app.js';
+export {default as ShadowmapDemo} from '../../examples/core/shadowmap/src/app.js';
+export {default as TransformFeedbackDemo} from '../../examples/core/transform-feedback/app.js';
 
-export const EXAMPLE_PAGES = [
-  {
-    name: 'Overview',
-    content: 'markdown/examples.md'
-  },
-  {
-    name: 'Core Examples',
-    children: [
-      {
-        name: 'Cubemap',
-        content: {
-          demo: 'CubemapDemo',
-          code: `${GITHUB_TREE}/examples/core/cubemap`
-        }
-      },
-      // {
-      //   name: 'Custom Picking',
-      //   content: {
-      //     demo: 'CustomPickingDemo',
-      //     path: `${GITHUB_TREE}/examples/core/custom-picking/`
-      //   }
-      // },
-      {
-        name: 'Fragment',
-        content: {
-          demo: 'FragmentDemo',
-          code: `${GITHUB_TREE}/examples/core/fragment`
-        }
-      },
-      {
-        name: 'Instancing',
-        content: {
-          demo: 'InstancingDemo',
-          code: `${GITHUB_TREE}/examples/core/instancing`
-        }
-      },
-      {
-        name: 'Mandelbrot',
-        content: {
-          demo: 'MandelbrotDemo',
-          code: `${GITHUB_TREE}/examples/core/mandelbrot`
-        }
-      },
-      {
-        name: 'Picking',
-        content: {
-          demo: 'PickingDemo',
-          code: `${GITHUB_TREE}/examples/core/picking`,
-          path: `${RAW_GITHUB}/examples/core/picking/`
-        }
-      },
-      // {
-      //   name: 'DeferredRendering',
-      //   content: {
-      //     demo: 'DeferredRenderingDemo'
-      //   }
-      // },
-      // {
-      //   name: 'Particles',
-      //   content: {
-      //     demo: 'ParticlesDemo'
-      //   }
-      // },
-      // {
-      //   name: 'Persistence',
-      //   content: {
-      //     demo: 'PersistenceDemo'
-      //   }
-      // },
-      {
-        name: 'Shadowmap',
-        content: {
-          demo: 'ShadowmapDemo',
-          code: `${GITHUB_TREE}/examples/core/shadowmap`
-        }
-      },
-      {
-        name: 'Transform Feedback',
-        content: {
-          demo: 'TransformFeedbackDemo',
-          code: `${GITHUB_TREE}/examples/core/transform-feedback`
-        }
-      }
-    ]
-  },
-  {
-    name: 'WebGL Lessons',
-    children: [
-      {
-        name: 'Lesson 01 - Drawing',
-        content: {
-          demo: 'Lesson01',
-          code: `${GITHUB_TREE}/examples/lessons/01`
-        }
-      },
-      {
-        name: 'Lesson 02 - Color',
-        content: {
-          demo: 'Lesson02',
-          code: `${GITHUB_TREE}/examples/lessons/02`
-        }
-      },
-      {
-        name: 'Lesson 03 - Movement',
-        content: {
-          demo: 'Lesson03',
-          code: `${GITHUB_TREE}/examples/lessons/03`
-        }
-      },
-      {
-        name: 'Lesson 04 - 3D Objects',
-        content: {
-          demo: 'Lesson04',
-          code: `${GITHUB_TREE}/examples/lessons/04`
-        }
-      },
-      {
-        name: 'Lesson 05 - Textures',
-        content: {
-          demo: 'Lesson05',
-          code: `${GITHUB_TREE}/examples/lessons/05`,
-          path: `${RAW_GITHUB}/examples/lessons/05/`
-        }
-      },
-      {
-        name: 'Lesson 06 - Texture Filters',
-        content: {
-          demo: 'Lesson06',
-          code: `${GITHUB_TREE}/examples/lessons/06/`,
-          path: `${RAW_GITHUB}/examples/lessons/06/`
-        }
-      },
-      {
-        name: 'Lesson 07 - Lighting',
-        content: {
-          demo: 'Lesson07',
-          code: `${GITHUB_TREE}/examples/lessons/07/`,
-          path: `${RAW_GITHUB}/examples/lessons/07/`
-        }
-      },
-      {
-        name: 'Lesson 08 - Transparency',
-        content: {
-          demo: 'Lesson08',
-          code: `${GITHUB_TREE}/examples/lessons/08/`,
-          path: `${RAW_GITHUB}/examples/lessons/08/`
-        }
-      },
-      {
-        name: 'Lesson 09 - Moving Objects',
-        content: {
-          demo: 'Lesson09',
-          code: `${GITHUB_TREE}/examples/lessons/09/`,
-          path: `${RAW_GITHUB}/examples/lessons/09/`
-        }
-      },
-      // {
-      //   name: 'Lesson 10',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
-      // },
-      // {
-      //   name: 'Lesson 11',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
-      // },
-      // {
-      //   name: 'Lesson 12',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
-      // },
-      // {
-      //   name: 'Lesson 13',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
-      // },
-      // {
-      //   name: 'Lesson 14',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
-      // },
-      // {
-      //   name: 'Lesson 15',
-      //   content: {
-      //     demo: 'Lesson03'
-      //   }
-      // },
-      {
-        name: 'Lesson 16 - Render to Texture',
-        content: {
-          demo: 'Lesson16',
-          code: `${GITHUB_TREE}/examples/lessons/16/`,
-          path: `${RAW_GITHUB}/examples/lessons/16/`
-        }
-      }
-    ]
-  }
-];
+export {default as Lesson01} from '../../examples/lessons/01/app.js';
+export {default as Lesson02} from '../../examples/lessons/02/app.js';
+export {default as Lesson03} from '../../examples/lessons/03/app.js';
+export {default as Lesson04} from '../../examples/lessons/04/app.js';
+export {default as Lesson05} from '../../examples/lessons/05/app.js';
+export {default as Lesson06} from '../../examples/lessons/06/app.js';
+export {default as Lesson07} from '../../examples/lessons/07/app.js';
+export {default as Lesson08} from '../../examples/lessons/08/app.js';
+export {default as Lesson09} from '../../examples/lessons/09/app.js';
+export {default as Lesson10} from '../../examples/lessons/10/app.js';
+export {default as Lesson11} from '../../examples/lessons/11/app.js';
+export {default as Lesson16} from '../../examples/lessons/16/app.js';
 */
+
+// NEED TO USE ES6 STYLE EXPORT...: IMPORT FIRST AND THEN EXPORT
+import {default as Instancing} from '../../examples/core/instancing/app.js';
+import {default as Cubemap} from '../../examples/core/cubemap/app.js';
+// import {default as CustomPicking} from '../../examples/core/custom-picking/app.js';
+// import {default as DeferredRendering} from '../../examples/core/deferred-rendering/app.js';
+import {default as Mandelbrot} from '../../examples/core/mandelbrot/app.js';
+import {default as Fragment} from '../../examples/core/fragment/app.js';
+// import {default as Particles} from '../../examples/core/particles/app.js';
+// import {default as Persistence} from '../../examples/core/persistence/app.js';
+import {default as Picking} from '../../examples/core/picking/app.js';
+import {default as Shadowmap} from '../../examples/core/shadowmap/src/app.js';
+import {default as TransformFeedback} from '../../examples/core/transform-feedback/app.js';
+
+import {default as Lesson01} from '../../examples/lessons/01/app.js';
+import {default as Lesson02} from '../../examples/lessons/02/app.js';
+import {default as Lesson03} from '../../examples/lessons/03/app.js';
+import {default as Lesson04} from '../../examples/lessons/04/app.js';
+import {default as Lesson05} from '../../examples/lessons/05/app.js';
+import {default as Lesson06} from '../../examples/lessons/06/app.js';
+import {default as Lesson07} from '../../examples/lessons/07/app.js';
+import {default as Lesson08} from '../../examples/lessons/08/app.js';
+import {default as Lesson09} from '../../examples/lessons/09/app.js';
+import {default as Lesson10} from '../../examples/lessons/10/app.js';
+import {default as Lesson11} from '../../examples/lessons/11/app.js';
+import {default as Lesson16} from '../../examples/lessons/16/app.js';
+
+export default {
+  Instancing,
+  Cubemap,
+  // CustomPicking,
+  // DeferredRendering,
+  Mandelbrot,
+  Fragment,
+  // Particles,
+  // Persistence,
+  Picking,
+  Shadowmap,
+  TransformFeedback,
+
+  Lesson01,
+  Lesson02,
+  Lesson03,
+  Lesson04,
+  Lesson05,
+  Lesson06,
+  Lesson07,
+  Lesson08,
+  Lesson09,
+  Lesson10,
+  Lesson11,
+  Lesson16
+};
