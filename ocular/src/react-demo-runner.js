@@ -26,7 +26,7 @@ export default class DemoRunner extends Component {
   render() {
     const {width, height} = this.props;
     return (
-      <div style={{width, height, padding: 0, border: 0}}>
+      <div className='fg' style={{width, height, padding: 0, border: 0}}>
         <canvas
           id={this.props.canvas}
           style={{width: '100%', height: '100%', padding: 0, border: 0}}/>

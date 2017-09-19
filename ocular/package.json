@@ -8,13 +8,10 @@
     "build": "ocular build",
     "lint": "ocular lint"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "ocular": "^0.2.4"
-  },
   "dependencies": {
-    "math.gl": ">=1.0.0-alpha.7"
-  }
+    "math.gl": ">=1.0.0-alpha.7",
+    "ocular": "^0.2.8",
+    "stats.js": "^0.17.0"
+  },
+  "license": "MIT"
 }
