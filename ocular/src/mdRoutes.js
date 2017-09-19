@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+import overview from './overview.md';
 import apiReference from '../../docs/api-reference/README.md';
 import animationLoop from '../../docs/api-reference/core/animation-loop.md';
 import buffer from '../../docs/api-reference/webgl/buffer.md';
@@ -79,6 +80,10 @@ export default [
     name: 'Examples',
     path: '/examples',
     data: [{
+      name: 'Overview',
+      markdown: overview
+    },
+    {
       name: 'Showcases',
       children: [
         {
