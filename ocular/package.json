@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "math.gl": ">=1.0.0-alpha.7",
-    "ocular": "^0.2.12",
+    "ocular": "^0.2.13",
     "stats.js": "^0.17.0"
   },
   "license": "MIT"
