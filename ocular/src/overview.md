@@ -3,49 +3,49 @@
 <div>
   <div class="thumb">
     <div class="bg-black" data-title="Cubemap">
-      <a href="#/examples/core-examples/cubemap">
+      <a href="#/examples/showcases/cubemap">
         <img src="images/example-cubemap.jpg" />
       </a>
     </div>
   </div>
   <div class="thumb">
     <div class="bg-black" data-title="Fragment">
-      <a href="#/examples/core-examples/fragment">
+      <a href="#/examples/showcases/fragment">
         <img src="images/example-fragment.jpg" />
       </a>
     </div>
   </div>
   <div class="thumb">
     <div class="bg-black" data-title="Instancing">
-      <a href="#/examples/core-examples/instancing">
+      <a href="#/examples/showcases/instancing">
         <img src="images/example-instancing.jpg" />
       </a>
     </div>
   </div>
   <div class="thumb">
     <div class="bg-black" data-title="Mandelbrot">
-      <a href="#/examples/core-examples/mandelbrot">
+      <a href="#/examples/showcases/mandelbrot">
         <img src="images/example-mandelbrot.jpg" />
       </a>
     </div>
   </div>
   <div class="thumb">
     <div class="bg-black" data-title="Picking">
-      <a href="#/examples/core-examples/picking">
+      <a href="#/examples/showcases/picking">
         <img src="images/example-picking.jpg" />
       </a>
     </div>
   </div>
   <div class="thumb">
     <div class="bg-black" data-title="Shadowmap">
-      <a href="#/examples/core-examples/shadowmap">
+      <a href="#/examples/showcases/shadowmap">
         <img src="images/example-shadowmap.jpg" />
       </a>
     </div>
   </div>
   <div class="thumb">
     <div class="bg-black" data-title="Transform Feedback">
-      <a href="#/examples/core-examples/transform-feedback">
+      <a href="#/examples/showcases/transform-feedback">
         <img src="images/example-transform-feedback.jpg" />
       </a>
     </div>
