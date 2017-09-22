@@ -1,7 +1,3 @@
-import {setContextDefaults} from 'luma.gl';
-setContextDefaults({webgl2: true});
-
-// NEED TO USE ES6 STYLE EXPORT...: IMPORT FIRST AND THEN EXPORT
 import {default as Instancing} from '../../examples/core/instancing/app.js';
 import {default as Cubemap} from '../../examples/core/cubemap/app.js';
 // import {default as CustomPicking} from '../../examples/core/custom-picking/app.js';
@@ -25,6 +21,8 @@ import {default as Lesson08} from '../../examples/lessons/08/app.js';
 import {default as Lesson09} from '../../examples/lessons/09/app.js';
 import {default as Lesson10} from '../../examples/lessons/10/app.js';
 import {default as Lesson11} from '../../examples/lessons/11/app.js';
+import {default as Lesson12} from '../../examples/lessons/12/app.js';
+import {default as Lesson13} from '../../examples/lessons/13/app.js';
 import {default as Lesson16} from '../../examples/lessons/16/app.js';
 
 /* eslint-disable */
@@ -55,6 +53,8 @@ const Lesson08Demo = props => (<Demo {...props} demo={Lesson08}/>);
 const Lesson09Demo = props => (<Demo {...props} demo={Lesson09}/>);
 const Lesson10Demo = props => (<Demo {...props} demo={Lesson10}/>);
 const Lesson11Demo = props => (<Demo {...props} demo={Lesson11}/>);
+const Lesson12Demo = props => (<Demo {...props} demo={Lesson12}/>);
+const Lesson13Demo = props => (<Demo {...props} demo={Lesson13}/>);
 const Lesson16Demo = props => (<Demo {...props} demo={Lesson16}/>);
 
 export {
@@ -81,5 +81,7 @@ export {
   Lesson09Demo,
   Lesson10Demo,
   Lesson11Demo,
+  Lesson12Demo,
+  Lesson13Demo,
   Lesson16Demo
 };

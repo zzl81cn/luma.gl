@@ -4,13 +4,13 @@ import {
 } from 'luma.gl';
 
 const PLANETS = [
-  {name: 'Jupiter', textureUrl: 'images/jupiter.jpg'},
-  {name: 'Mars', textureUrl: 'images/mars.jpg'},
-  {name: 'Mercury', textureUrl: 'images/mercury.jpg'},
-  {name: 'Neptune', textureUrl: 'images/neptune.jpg'},
-  {name: 'Saturn', textureUrl: 'images/saturn.jpg'},
-  {name: 'Uranus', textureUrl: 'images/uranus.jpg'},
-  {name: 'Venus', textureUrl: 'images/venus.jpg'}
+  {name: 'Jupiter', textureUrl: 'jupiter.jpg'},
+  {name: 'Mars', textureUrl: 'mars.jpg'},
+  {name: 'Mercury', textureUrl: 'mercury.jpg'},
+  {name: 'Neptune', textureUrl: 'neptune.jpg'},
+  {name: 'Saturn', textureUrl: 'saturn.jpg'},
+  {name: 'Uranus', textureUrl: 'uranus.jpg'},
+  {name: 'Venus', textureUrl: 'venus.jpg'}
 ];
 
 let pickPosition = [0, 0];
