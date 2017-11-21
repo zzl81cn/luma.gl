@@ -4,7 +4,8 @@
     "start-local": "webpack-dev-server --env.local --progress --hot --open -d"
   },
   "dependencies": {
-    "luma.gl": ">=4.0.0"
+    "luma.gl": ">=4.0.0",
+    "webworkify-webpack": "^2.1.0"
   },
   "devDependencies": {
     "webpack-dev-server": "^2.4.0",

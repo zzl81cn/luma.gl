@@ -76,7 +76,7 @@ void main(void) {
 }
 `;
 
-const animationLoopOptions = {
+export const animationLoopOptions = {
   // gl: createGLContext()})
   onInitialize: ({gl}) => {
 

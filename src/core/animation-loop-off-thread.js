@@ -34,6 +34,7 @@ export default class AnimationLoopOffThread {
         case 'resize':
           self.canvasWidth = evt.data.width;
           self.canvasHeight = evt.data.height;
+          self.devicePixelRatio = evt.data.devicePixelRatio;
           break;
 
         case 'setViewParameters':
@@ -51,7 +52,11 @@ export default class AnimationLoopOffThread {
   /*
    * @param {HTMLCanvasElement} canvas - if provided, width and height will be passed to context
    */
-  constructor({worker}) {
+  constructor({
+    worker,
+    onInitialize = () => {},
+    onFinalize = () => {}
+  }) {
     worker.postMessage({command: 'initialize'});
     this.worker = worker;
 
@@ -60,6 +65,8 @@ export default class AnimationLoopOffThread {
     this.height = null;
 
     this._updateFrame = this._updateFrame.bind(this);
+    this._onInitialize = onInitialize;
+    this._onFinalize = onFinalize;
   }
 
   // Public methods
@@ -100,10 +107,12 @@ export default class AnimationLoopOffThread {
         }, [offscreen]);
 
         this.canvas = realCanvas;
+
+        this._onInitialize(this);
       })
       .then(() => {
         if (!this._stopped && !this._animationFrameId) {
-          requestAnimationFrame(this._updateFrame);
+          this._animationFrameId = requestAnimationFrame(this._updateFrame);
         }
       });
     }
@@ -120,6 +129,7 @@ export default class AnimationLoopOffThread {
       cancelAnimationFrame(this._animationFrameId);
       this._animationFrameId = null;
       this._stopped = true;
+      this._onFinalize(this);
     }
     this.worker.postMessage({command: 'stop'});
     return this;
@@ -141,7 +151,7 @@ export default class AnimationLoopOffThread {
         });
       }
     }
-    requestAnimationFrame(this._updateFrame);
+    this._animationFrameId = requestAnimationFrame(this._updateFrame);
   }
 
 }
