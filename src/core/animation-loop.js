@@ -6,11 +6,11 @@ import {Framebuffer} from '../webgl';
 
 // Node.js polyfills for requestAnimationFrame and cancelAnimationFrame
 export function requestAnimationFrame(callback) {
-  return isBrowser ? window.requestAnimationFrame(callback) : setTimeout(callback, 1000 / 60);
+  return isBrowser && window.requestAnimationFrame ? window.requestAnimationFrame(callback) : setTimeout(callback, 1000 / 60);
 }
 
 export function cancelAnimationFrame(timerId) {
-  return isBrowser ? window.cancelAnimationFrame(timerId) : clearTimeout(timerId);
+  return isBrowser && window.requestAnimationFrame ? window.cancelAnimationFrame(timerId) : clearTimeout(timerId);
 }
 
 export default class AnimationLoop {
@@ -24,6 +24,7 @@ export default class AnimationLoop {
     onRender = () => {},
     onFinalize = () => {},
 
+    offThread = false,
     gl = null,
     glOptions = {
       preserveDrawingBuffer: true
@@ -68,6 +69,7 @@ export default class AnimationLoop {
     this.height = height;
 
     this.gl = gl;
+    this.offThread = offThread;
 
     return this;
   }
@@ -169,6 +171,9 @@ export default class AnimationLoop {
     // call callback
     this._onRender(this._callbackData);
     // end callback
+    if (this.offThread) {
+      this.gl.commit();
+    }
 
     // Increment tick
     this._callbackData.tick++;

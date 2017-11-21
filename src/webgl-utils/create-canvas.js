@@ -1,6 +1,6 @@
 // Resizing a webgl canvas
 
-/* global window, document */
+/* global window, self, document */
 import {log} from '../utils';
 
 const isBrowser = typeof window !== 'undefined';
@@ -59,8 +59,8 @@ export function getCanvas({id}) {
 // Gets current size of canvas in css (logical/window) coordinates
 export function getCSSSize(canvas) {
   return {
-    width: canvas.clientWidth,
-    height: canvas.clientHeight
+    width: canvas.clientWidth || self.canvasWidth || 1,
+    height: canvas.clientHeight || self.canvasHeight || 1
   };
 }
 
@@ -85,7 +85,7 @@ export function calculateDrawingBufferSize(canvas, {
     log.deprecated('useDevicePixelRatio', 'useDevicePixels');
     useDevicePixels = useDevicePixelRatio;
   }
-  const cssToDevicePixels = useDevicePixels ? window.devicePixelRatio || 1 : 1;
+  const cssToDevicePixels = useDevicePixels ? self.devicePixelRatio || 1 : 1;
 
   // Lookup the size the browser is displaying the canvas in CSS pixels
   // and compute a size needed to make our drawingbuffer match it in
