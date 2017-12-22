@@ -52,8 +52,8 @@ model.render({
 | `setAttributes` | Sets map of attributes (Arrays or buffers) |
 | `getUniforms` | Returns map of currently stored uniforms |
 | `setUniforms` | Stores named uniforms {key, value} |
-| `render` | Takes uniforms |
-| `draw` | Applies any gl settings temporarily and calls `render` |
+| `render` | Renders the model with provided uniforms, attributes and samplers |
+| `draw` | Applies gl settings temporarily and calls `render` |
 | `onBeforeRender` | Called before model renders |
 | `onAfterRender` | Called after model renders |
 | `setProgramState` | Sets uniforms, attributes, textures, uses program |
@@ -74,6 +74,7 @@ The constructor for the Model class. Use this to create a new Model.
   * `modules` - shader modules to be applied.
   * `moduleSettings` - any uniforms needed by shader modules.
   * `program` - pre created program to use, when provided, vs, ps and modules are not used.
+  * `shaderCache` - (ShaderCache) - Compiled shader (Vertex and Fragment) are cached in this object very first time they got compiled and then retrieved when same shader is used. When using multiple Model objects with duplicate shaders, use the same shaderCache object for better performance.
   * `isInstanced` - default value is false.
   * `instanceCount` - default value is 0.
   * `vertexCount` - when not provided will be deduced from `geometry` object.
@@ -81,6 +82,31 @@ The constructor for the Model class. Use this to create a new Model.
   * `geometry` - geometry object, from which attributes, vertex count and drawing mode are deduced.
   * `onBeforeRender` - function to be called before every time this model is drawn.
   * `onAfterRender` - function to be called after every time this model is drawn.
+
+### draw
+
+Render the model.
+
+#### Parameters
+
+* `opts` - contains following named properties.
+  * `moduleSettings` - any uniforms needed by shader modules.
+  * `uniforms` - uniform values to be used for drawing.
+  * `attributes` - attribute definitions to be used for drawing.
+  * `samplers` - texture mappings to be used for drawing.
+  * `parameters` - temporary gl settings to be applied to this draw call.
+  * `framebuffer` - if provided, render to framebuffer
+
+### render
+
+Render the model.
+
+#### Parameters
+
++ `uniforms` - uniform values to be used for drawing.
++ `attributes` - attribute definitions to be used for drawing.
++ `samplers` - texture mappings to be used for drawing.
+
 
 ## Remarks
 * All instance methods in `Model` are chainable
