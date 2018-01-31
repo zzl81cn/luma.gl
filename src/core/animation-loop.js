@@ -241,6 +241,7 @@ export default class AnimationLoop {
   // Default viewport setup
   _resizeViewport() {
     if (this.autoResizeViewport) {
+      // console.log(`Viewport start (0, 0) W: ${this.gl.canvas.width} H: ${this.gl.canvas.height}`);
       this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     }
   }
