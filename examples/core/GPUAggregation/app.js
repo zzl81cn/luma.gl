@@ -1,11 +1,14 @@
 /* eslint-disable no-var, max-statements */
 
-import {AnimationLoop, Program, Buffer, GL, setParameters} from 'luma.gl';
+import {
+  AnimationLoop, Buffer, GL, setParameters,
+  Model
+} from 'luma.gl';
 import assert from 'assert';
 /* global console */
 /* eslint-disable no-console */
 
-const VERTEX_SHADER = `\
+const VERTEX_SHADER_POINTS = `\
 attribute vec2 positions;
 uniform vec2 windowRect;
 void main(void) {
@@ -15,13 +18,13 @@ void main(void) {
 }
 `;
 
-const FRAGMENT_SHADER = `\
+const FRAGMENT_SHADER_POINTS = `\
 #ifdef GL_ES
 precision highp float;
 #endif
 
 void main(void) {
-  gl_FragColor = vec4(0.2, 0.2, 1.0, 1.0);
+  gl_FragColor = vec4(1.0, 0, 0, 1.0);
 }
 `;
 
@@ -41,59 +44,60 @@ const animationLoop = new AnimationLoop({
       blendEquation: GL.FUNC_ADD,
       blendFunc: [GL.ONE, GL.ONE]
 //      blendColor: [1.0, 1.0, 1.0, 1.0],
-
     });
 
-    var program = new Program(gl, {
-      vs: VERTEX_SHADER,
-      fs: FRAGMENT_SHADER
-    });
-
-    // const LINE_VERTS = [50, 10,   canvas.width, canvas.height]; // [-1, -1,   0.9, 0.9];
+    const pointCount = 100;
+    // Get random points in (0, 0 ) -> (canvas.width, canvas.height)
     const points = getRandomPoints({
       x: 0,
       y: 0,
       width: canvas.width,
       height: canvas.height,
-      count: 100
+      count: pointCount
     });
-    const boundingRect = getBoundingRect(points, 100);
+    const boundingRect = getBoundingRect(points, pointCount);
 
-    var linePositions = new Buffer(gl, {size: 2, data: new Float32Array(points)});
+    const pointPositions = new Buffer(gl, {size: 2, data: new Float32Array(points)});
     const boundingRectPositions = new Buffer(gl, {size: 2, data: new Float32Array(boundingRect)});
     const windowRect = [canvas.width, canvas.height];
-    program.use();
+    const pointsModel = new Model(gl, {
+      id: 'Points-Model',
+      vs: VERTEX_SHADER_POINTS,
+      fs: FRAGMENT_SHADER_POINTS,
+      attributes: {
+        positions: pointPositions
+      },
+      uniforms: {
+        windowRect
+      },
+      vertexCount: pointCount,
+      drawMode: GL.POINTS
+    });
+    const boundingRectModel = new Model(gl, {
+      id: 'BoundingRect-Model',
+      vs: VERTEX_SHADER_POINTS,
+      fs: FRAGMENT_SHADER_POINTS,
+      attributes: {
+        positions: boundingRectPositions
+      },
+      uniforms: {
+        windowRect
+      },
+      vertexCount: 2,
+      drawMode: GL.LINES
+    });
 
+    return {
+      pointsModel,
+      boundingRectModel
+    };
+  },
+  onRender(context) {
+    const {gl, pointsModel, boundingRectModel} = context;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Draw Lines
-    program
-      .setBuffers({
-        positions: linePositions
-      })
-      .setUniforms({
-        windowRect
-      });
-    gl.drawArrays(gl.POINTS, 0, 100);
-
-    // EACH draw render (0.2, 0.2, 1.0) as it looks blue ish here but following draw make it white.
-    gl.drawArrays(gl.POINTS, 0, 100);
-    gl.drawArrays(gl.POINTS, 0, 100);
-    gl.drawArrays(gl.POINTS, 0, 100);
-    gl.drawArrays(gl.POINTS, 0, 100);
-
-    program
-      .setBuffers({
-        positions: boundingRectPositions
-      })
-      .setUniforms({
-        windowRect
-      });
-    gl.drawArrays(gl.LINES, 0, 2);
-    gl.drawArrays(gl.LINES, 0, 2);
-    gl.drawArrays(gl.LINES, 0, 2);
-    gl.drawArrays(gl.LINES, 0, 2);
-
+    pointsModel.render();
+    boundingRectModel.render();
   }
 });
 

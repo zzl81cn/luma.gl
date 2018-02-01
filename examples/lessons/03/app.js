@@ -1,7 +1,7 @@
 /* eslint-disable array-bracket-spacing, no-multi-spaces */
 import {
   GL, AnimationLoop, Program, Model, Geometry, Matrix4,
-  setParameters
+  setParameters, Buffer
 } from 'luma.gl';
 
 const FRAGMENT_SHADER = `\
@@ -61,8 +61,29 @@ const animationLoop = new AnimationLoop({
       depthFunc: gl.LEQUAL
     });
 
+    const positionsBuffer = new Buffer(gl, {size: 3, data: new Float32Array([0, 1, 0,  -1, -1, 0,  1, -1, 0])});
+    const colorsBuffer = new Buffer(gl, {size: 4, data: new Float32Array([1, 0, 0, 1,  0, 1, 0, 1,  0, 0, 1, 1])});
+    const colorsBuffer2 = new Buffer(gl, {
+      target: GL.ARRAY_BUFFER
+    });
+
+    colorsBuffer2
+    .setData({data: new Float32Array([1, 0, 0, 1,  0, 1, 0, 1,  0, 0, 1, 1])})
+    .setDataLayout({size: 4});
+
     const program = new Program(gl, {vs: VERTEX_SHADER, fs: FRAGMENT_SHADER});
-    const triangle = new Model(gl, {geometry: triangleGeometry, program});
+    const triangle = new Model(gl, {
+      // geometry: triangleGeometry, program
+      attributes: {
+        // positions: {size: 3, value: new Float32Array([0, 1, 0,  -1, -1, 0,  1, -1, 0])},
+        positions: positionsBuffer,
+        colors: colorsBuffer // colorsBuffer
+      },
+      vs: VERTEX_SHADER,
+      fs: FRAGMENT_SHADER,
+      drawMode: GL.TRIANGLE_STRIP,
+      vertexCount: 3
+    });
     const square = new Model(gl, {geometry: squareGeometry, program});
 
     return {triangle, square};

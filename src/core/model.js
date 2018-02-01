@@ -530,7 +530,7 @@ count: ${this.stats.profileFrameCount}`
       const attributeTable = this._getAttributesTable({
         header: `${this.id} attributes`,
         program: this.program,
-        attributes: Object.assign({}, this.geometry.attributes, this.attributes)
+        attributes: Object.assign({}, this.geometry ? this.geometry.attributes : {}, this.attributes)
       });
       log.table(priority, attributeTable);
 
@@ -566,7 +566,7 @@ count: ${this.stats.profileFrameCount}`
     program
   } = {}) {
     assert(program);
-    const attributeLocations = program._attributeLocations;
+    const attributeLocations = program._attributeToLocationMap;
     const table = {}; // {[header]: {}};
 
     // Add used attributes
