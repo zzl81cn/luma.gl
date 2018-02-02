@@ -22,12 +22,12 @@ void main(void) {
 const VERTEX_SHADER_POINTS_TO_BINS = `\
 attribute vec2 positions;
 uniform vec2 windowRect;
-uniform vec2 cellRect;
+uniform vec2 cellSize;
 void main(void) {
 
   // Map each vertex from (0,0):windowRect -> (0, 0): texRect
-  vec2 pos = positions / cellRect;
-  vec2 texRect = windowRect / cellRect; // TODO-1: this must be Integer division
+  vec2 pos = positions / cellSize;
+  vec2 texRect = windowRect / cellSize; // TODO-1: this must be Integer division
 
   // TODO-2: final rendering buffer size should be textRect
 
@@ -74,8 +74,38 @@ void main(void) {
 }
 `;
 
-let rttFramebuffer;
-let rttTexture;
+// RENDER each pixel in Grid as vertex, sample the value for gridTex
+// Setup blending to sum values of RGB and Max value for A
+const AGGREGATE_SUM_GRIDTEX_VS = `\
+attribute vec2 positions;
+attribute vec2 texCoords;
+varying vec2 vTextureCoord;
+void main(void) {
+  // Position is in screen space
+   gl_Position = vec4(-1.0, -1.0, 1.0, 1.0);
+  //gl_Position = vec4(positions.rg, 1.0, 1.0); //-hack
+
+  vTextureCoord = texCoords;
+}
+`;
+
+const AGGREGATE_SUM_GRIDTEX_FS = `\
+#ifdef GL_ES
+precision highp float;
+#endif
+
+varying vec2 vTextureCoord;
+uniform sampler2D uSampler;
+
+void main(void) {
+  vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+  // gl_FragColor = vec4(1.0, 0, 0, 1.0);
+  gl_FragColor = vec4(textureColor.rgb, textureColor.r);
+}
+`;
+
+let gridFramebuffer;
+let girdAggregrationFramebuffer;
 
 const animationLoop = new AnimationLoop({
   useDevicePixels: false,
@@ -95,14 +125,14 @@ const animationLoop = new AnimationLoop({
 //      blendColor: [1.0, 1.0, 1.0, 1.0],
     });
 
-    const pointCount = 1000;
+    const pointCount = 10; //00;
     // Get random points in (0, 0 ) -> (canvas.width, canvas.height)
     let points = getRandomPoints({
       x: 0,
       y: 0,
       width: canvas.width,
       height: canvas.height,
-      count: pointCount / 2
+      count: 2
     });
 
     const points2 = getRandomPoints({
@@ -110,7 +140,7 @@ const animationLoop = new AnimationLoop({
       y: 50,
       width: 10,
       height: 10,
-      count: pointCount / 2
+      count: pointCount - 2
     });
 
     points = points.concat(points2);
@@ -126,13 +156,25 @@ const animationLoop = new AnimationLoop({
       1.0, 0.0,
       0.0, 0.0
     ]);
-    const pointPositions = new Buffer(gl, {size: 2, data: new Float32Array(points)});
-    const boundingRectPositions = new Buffer(gl, {size: 2, data: new Float32Array(boundingRect)});
-    const gridTexRectPositions =  new Buffer(gl, {size: 2, data: new Float32Array(gridTexRectVertices)});
-    const gridTexRectTexCoords =  new Buffer(gl, {size: 2, data: new Float32Array(gridTexCoords)});
 
     const windowRect = [canvas.width, canvas.height];
-    const cellRect = [10, 10];
+    const cellSize = [10, 10];
+    const gridSize = [
+      Math.floor(windowRect[0] / cellSize[0]),
+      Math.floor(windowRect[1] / cellSize[1])
+    ];
+
+    const gridTexPixels = getVertexPerEachPixel(gridSize);
+    const gridTexTexCoords = getTexCoordPerEachPixel(gridSize);
+
+    const pointPositions = new Buffer(gl, {size: 2, data: new Float32Array(points)});
+    const boundingRectPositions = new Buffer(gl, {size: 2, data: new Float32Array(boundingRect)});
+    const gridTexRectPositions = new Buffer(gl, {size: 2, data: new Float32Array(gridTexRectVertices)});
+    const gridTexRectTexCoords = new Buffer(gl, {size: 2, data: new Float32Array(gridTexCoords)});
+
+    const gridTexRectPixelPositions = new Buffer(gl, {size: 2, data: new Float32Array(gridTexPixels)});
+    const gridTexRectPixelTexCoords = new Buffer(gl, {size: 2, data: new Float32Array(gridTexTexCoords)});
+
     const pointsModel = new Model(gl, {
       id: 'Points-Model',
       // vs: VERTEX_SHADER_POINTS,
@@ -143,7 +185,7 @@ const animationLoop = new AnimationLoop({
       },
       uniforms: {
         windowRect,
-        cellRect
+        cellSize
       },
       vertexCount: pointCount,
       drawMode: GL.POINTS
@@ -174,57 +216,103 @@ const animationLoop = new AnimationLoop({
       drawMode: GL.TRIANGLE_STRIP
     });
 
+    const girdAggregationTexModel = new Model(gl, {
+      id: 'GridAggregationTexture-Model',
+      vs: AGGREGATE_SUM_GRIDTEX_VS,
+      fs: AGGREGATE_SUM_GRIDTEX_FS,
+      attributes: {
+        positions: gridTexRectPixelPositions,
+        texCoords: gridTexRectPixelTexCoords
+      },
+      vertexCount: gridTexPixels.length / 2,
+      drawMode: GL.POINTS
+    });
+
     return {
       pointsModel,
       boundingRectModel,
-      girdTexModel
+      girdTexModel,
+      girdAggregationTexModel,
+      cellSize,
+      gridSize
     };
   },
   onRender(context) {
-    const {gl, pointsModel, boundingRectModel, canvas, girdTexModel} = context;
+    const {
+      gl, pointsModel, boundingRectModel, girdTexModel,
+      cellSize, gridSize, girdAggregationTexModel
+    } = context;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    const cellCount = [10, 10];
-    const gridSize = [
-      Math.floor(canvas.width / cellCount[0]),
-      Math.floor(canvas.height / cellCount[1])
-    ];
-
-    generateGridAggregationTexture(gl, {
+    generateGridTexture(gl, {
       gridSize,
       pointsModel
     });
 
     girdTexModel.render({
-      uSampler: rttFramebuffer.texture
+      uSampler: gridFramebuffer.texture
     });
     // pointsModel.render();
     // boundingRectModel.render();
     //
     // pointsModel.render();
     // pointsModel.render();
+
+    generateGridAggregationTexture(gl, {
+      gridSize,
+      girdAggregationTexModel
+    });
+
+    girdTexModel.render({
+      uSampler: girdAggregrationFramebuffer.texture
+    });
+
+    return false;
   }
 });
 
 function generateGridAggregationTexture(gl, opts) {
+  const {gridSize, girdAggregationTexModel} = opts;
+
+  girdAggregrationFramebuffer = setupFramebuffer(gl, {gridSize});
+
+  girdAggregationTexModel.draw({
+    framebuffer: girdAggregrationFramebuffer,
+    parameters: {
+      clearColor: [0, 0, 0, 0],
+      clearDepth: 0,
+      blendEquation: [GL.FUNC_ADD, GL.MAX]
+    },
+    uniforms: {
+      uSampler: gridFramebuffer.texture
+    }
+  });
+
+}
+
+function generateGridTexture(gl, opts) {
   const {gridSize, pointsModel} = opts;
 
-  setupFramebuffer(gl, {gridSize});
+  gridFramebuffer = setupFramebuffer(gl, {gridSize});
 
   pointsModel.draw({
-    framebuffer: rttFramebuffer
+    framebuffer: gridFramebuffer,
+    parameters: {
+      clearColor: [0, 0, 0, 0],
+      clearDepth: 0
+    }
   });
 
 }
 
 function setupFramebuffer(gl, opts) {
   const {gridSize} = opts;
-  rttTexture = new Texture2D(gl, {
+  const rttTexture = new Texture2D(gl, {
     data: null,
     format: GL.RGBA,
     type: GL.UNSIGNED_BYTE,
     border: 0,
-    mipmaps: true,
+    mipmaps: false,
     parameters: {
       [GL.TEXTURE_MAG_FILTER]: GL.NEAREST, // GL.LINEAR,
       [GL.TEXTURE_MIN_FILTER]: GL.NEAREST // GL.LINEAR_MIPMAP_NEAREST
@@ -240,7 +328,7 @@ function setupFramebuffer(gl, opts) {
     height: gridSize[1]
   });
 
-  rttFramebuffer = new Framebuffer(gl, {
+  const rttFramebuffer = new Framebuffer(gl, {
     width: gridSize[0],
     height: gridSize[1],
     attachments: {
@@ -248,7 +336,42 @@ function setupFramebuffer(gl, opts) {
       [GL.DEPTH_ATTACHMENT]: renderbuffer
     }
   });
+
+  return rttFramebuffer;
 }
+
+// Generates (x, y) screen coordinates for each point in the rect
+// x, y are in [-1, 1] range
+function getVertexPerEachPixel(rectSize) {
+  assert(Number.isFinite(rectSize[0]) && Number.isFinite(rectSize[1]));
+  const points = [];
+  for (let i = 0; i < rectSize[0]; i++) {
+    for (let j = 0; j < rectSize[1]; j++) {
+      const x = i * (2.0 / rectSize[0]) - 1.0;
+      const y = j * (2.0 / rectSize[1]) - 1.0;
+      points.push(x);
+      points.push(y);
+    }
+  }
+  return points;
+}
+
+// Generates (s, t) tex coordinates for each point in the rect
+// s, t are in [0, 1] range
+function getTexCoordPerEachPixel(rectSize) {
+  assert(Number.isFinite(rectSize[0]) && Number.isFinite(rectSize[1]));
+  const points = [];
+  for (let i = 0; i < rectSize[0]; i++) {
+    for (let j = 0; j < rectSize[1]; j++) {
+      const s = i / rectSize[0];
+      const t = j / rectSize[1];
+      points.push(s);
+      points.push(t);
+    }
+  }
+  return points;
+}
+
 animationLoop.getInfo = () => {
   return `
   <p>
