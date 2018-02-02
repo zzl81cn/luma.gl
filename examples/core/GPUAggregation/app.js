@@ -2,7 +2,7 @@
 
 import {
   AnimationLoop, Buffer, GL, setParameters,
-  Model
+  Model, Framebuffer, Renderbuffer, Texture2D
 } from 'luma.gl';
 import assert from 'assert';
 /* global console */
@@ -18,15 +18,64 @@ void main(void) {
 }
 `;
 
+
+const VERTEX_SHADER_POINTS_TO_BINS = `\
+attribute vec2 positions;
+uniform vec2 windowRect;
+uniform vec2 cellRect;
+void main(void) {
+
+  // Map each vertex from (0,0):windowRect -> (0, 0): texRect
+  vec2 pos = positions / cellRect;
+  vec2 texRect = windowRect / cellRect; // TODO-1: this must be Integer division
+
+  // TODO-2: final rendering buffer size should be textRect
+
+  // Map each vertex from (0,0):texRect -> (-1, -1):(1,1)
+  pos = (pos * (2., 2.) / (texRect)) - (1., 1.);
+  gl_Position = vec4(pos, 1.0, 1.0);
+}
+`;
+
+
 const FRAGMENT_SHADER_POINTS = `\
 #ifdef GL_ES
 precision highp float;
 #endif
 
 void main(void) {
-  gl_FragColor = vec4(1.0, 0, 0, 1.0);
+  gl_FragColor = vec4(0.1, 0, 0, 1.0);
 }
 `;
+
+const RENDER_GRIDTEX_VS = `\
+attribute vec2 positions;
+attribute vec2 texCoords;
+varying vec2 vTextureCoord;
+void main(void) {
+  gl_Position = vec4(positions, 1.0, 1.0);
+
+  vTextureCoord = texCoords;
+}
+`;
+
+const RENDER_GRIDTEX_FS = `\
+#ifdef GL_ES
+precision highp float;
+#endif
+
+varying vec2 vTextureCoord;
+uniform sampler2D uSampler;
+
+void main(void) {
+  vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+  // gl_FragColor = vec4(1.0, 0, 0, 1.0);
+  gl_FragColor = vec4(textureColor.rgb, 1.0);
+}
+`;
+
+let rttFramebuffer;
+let rttTexture;
 
 const animationLoop = new AnimationLoop({
   useDevicePixels: false,
@@ -46,29 +95,55 @@ const animationLoop = new AnimationLoop({
 //      blendColor: [1.0, 1.0, 1.0, 1.0],
     });
 
-    const pointCount = 100;
+    const pointCount = 1000;
     // Get random points in (0, 0 ) -> (canvas.width, canvas.height)
-    const points = getRandomPoints({
+    let points = getRandomPoints({
       x: 0,
       y: 0,
       width: canvas.width,
       height: canvas.height,
-      count: pointCount
+      count: pointCount / 2
     });
-    const boundingRect = getBoundingRect(points, pointCount);
 
+    const points2 = getRandomPoints({
+      x: 50,
+      y: 50,
+      width: 10,
+      height: 10,
+      count: pointCount / 2
+    });
+
+    points = points.concat(points2);
+
+    const boundingRect = getBoundingRect(points, pointCount);
+    // const canvasW = canvas.width;
+    // const canvasH = canvas.height;
+
+    const gridTexRectVertices = [1, 1,  -1, 1,  1, -1,  -1, -1];
+    const gridTexCoords = new Float32Array([
+      1.0, 1.0,
+      0.0, 1.0,
+      1.0, 0.0,
+      0.0, 0.0
+    ]);
     const pointPositions = new Buffer(gl, {size: 2, data: new Float32Array(points)});
     const boundingRectPositions = new Buffer(gl, {size: 2, data: new Float32Array(boundingRect)});
+    const gridTexRectPositions =  new Buffer(gl, {size: 2, data: new Float32Array(gridTexRectVertices)});
+    const gridTexRectTexCoords =  new Buffer(gl, {size: 2, data: new Float32Array(gridTexCoords)});
+
     const windowRect = [canvas.width, canvas.height];
+    const cellRect = [10, 10];
     const pointsModel = new Model(gl, {
       id: 'Points-Model',
-      vs: VERTEX_SHADER_POINTS,
+      // vs: VERTEX_SHADER_POINTS,
+      vs: VERTEX_SHADER_POINTS_TO_BINS,
       fs: FRAGMENT_SHADER_POINTS,
       attributes: {
         positions: pointPositions
       },
       uniforms: {
-        windowRect
+        windowRect,
+        cellRect
       },
       vertexCount: pointCount,
       drawMode: GL.POINTS
@@ -87,20 +162,93 @@ const animationLoop = new AnimationLoop({
       drawMode: GL.LINES
     });
 
+    const girdTexModel = new Model(gl, {
+      id: 'GridTexture-Model',
+      vs: RENDER_GRIDTEX_VS,
+      fs: RENDER_GRIDTEX_FS,
+      attributes: {
+        positions: gridTexRectPositions,
+        texCoords: gridTexRectTexCoords
+      },
+      vertexCount: 4,
+      drawMode: GL.TRIANGLE_STRIP
+    });
+
     return {
       pointsModel,
-      boundingRectModel
+      boundingRectModel,
+      girdTexModel
     };
   },
   onRender(context) {
-    const {gl, pointsModel, boundingRectModel} = context;
+    const {gl, pointsModel, boundingRectModel, canvas, girdTexModel} = context;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    pointsModel.render();
-    boundingRectModel.render();
+    const cellCount = [10, 10];
+    const gridSize = [
+      Math.floor(canvas.width / cellCount[0]),
+      Math.floor(canvas.height / cellCount[1])
+    ];
+
+    generateGridAggregationTexture(gl, {
+      gridSize,
+      pointsModel
+    });
+
+    girdTexModel.render({
+      uSampler: rttFramebuffer.texture
+    });
+    // pointsModel.render();
+    // boundingRectModel.render();
+    //
+    // pointsModel.render();
+    // pointsModel.render();
   }
 });
 
+function generateGridAggregationTexture(gl, opts) {
+  const {gridSize, pointsModel} = opts;
+
+  setupFramebuffer(gl, {gridSize});
+
+  pointsModel.draw({
+    framebuffer: rttFramebuffer
+  });
+
+}
+
+function setupFramebuffer(gl, opts) {
+  const {gridSize} = opts;
+  rttTexture = new Texture2D(gl, {
+    data: null,
+    format: GL.RGBA,
+    type: GL.UNSIGNED_BYTE,
+    border: 0,
+    mipmaps: true,
+    parameters: {
+      [GL.TEXTURE_MAG_FILTER]: GL.NEAREST, // GL.LINEAR,
+      [GL.TEXTURE_MIN_FILTER]: GL.NEAREST // GL.LINEAR_MIPMAP_NEAREST
+    },
+    width: gridSize[0],
+    height: gridSize[1],
+    dataFormat: GL.RGBA
+  });
+
+  const renderbuffer = new Renderbuffer(gl, {
+    format: GL.DEPTH_COMPONENT16,
+    width: gridSize[0],
+    height: gridSize[1]
+  });
+
+  rttFramebuffer = new Framebuffer(gl, {
+    width: gridSize[0],
+    height: gridSize[1],
+    attachments: {
+      [GL.COLOR_ATTACHMENT0]: rttTexture,
+      [GL.DEPTH_ATTACHMENT]: renderbuffer
+    }
+  });
+}
 animationLoop.getInfo = () => {
   return `
   <p>

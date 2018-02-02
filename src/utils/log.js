@@ -6,7 +6,7 @@ console.debug = console.debug || console.log;
 const cache = {};
 
 const log = {
-  priority: 3,
+  priority: 4,
   table(priority, table) {
     if (priority <= log.priority && table) {
       console.table(table);
