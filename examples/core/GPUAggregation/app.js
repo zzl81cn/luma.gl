@@ -12,10 +12,10 @@ const MARGIN = 2; // pixels
 
 const VERTEX_SHADER_POINTS = `\
 attribute vec2 positions;
-uniform vec2 windowRect;
+uniform vec2 windowSize;
 void main(void) {
-  // Map each vertex from (0,0):windowRect -> (-1, -1):(1,1)
-  vec2 pos = (positions * (2., 2.) / (windowRect)) - (1., 1.);
+  // Map each vertex from (0,0):windowSize -> (-1, -1):(1,1)
+  vec2 pos = (positions * (2., 2.) / (windowSize)) - (1., 1.);
   gl_Position = vec4(pos, 1.0, 1.0);
 }
 `;
@@ -23,19 +23,35 @@ void main(void) {
 
 const GENERATE_GRIDTEX_VS = `\
 attribute vec2 positions;
-uniform vec2 windowRect;
+uniform vec2 windowSize;
 uniform vec2 cellSize;
 void main(void) {
 
-  // Map each vertex from (0,0):windowRect -> (0, 0): texRect
-  vec2 pos = positions / cellSize;
-  vec2 texRect = windowRect / cellSize; // TODO-1: this must be Integer division
+  // -TODO- : some issue with this mapping
+  //  we are rendering to FB of size texRect, is this mapping correct?
 
-  // TODO-2: final rendering buffer size should be textRect
+  // Map each vertex from (0,0):windowSize -> (0, 0): texRect
+  vec2 pos = floor(positions / cellSize);
+  vec2 texRect = floor(windowSize / cellSize); // TODO-1: this must be Integer division
 
   // Map each vertex from (0,0):texRect -> (-1, -1):(1,1)
   pos = (pos * (2., 2.) / (texRect)) - (1., 1.);
   gl_Position = vec4(pos, 1.0, 1.0);
+
+  // //-hack remove this code
+  // // Map each vertex from (0,0):windowSize -> (-1, -1):(1,1)
+  // vec2 pos = (positions * (2., 2.) / (windowSize)) - (1., 1.);
+  // gl_Position = vec4(pos, 1.0, 1.0);
+
+  // // -hack- remove this code
+  // // Map each vertex from (0,0):windowSize -> (0, 0): texRect
+  // vec2 pos = floor(positions / cellSize);
+  // vec2 texRect = floor(windowSize / cellSize); // TODO-1: this must be Integer division
+  //
+  // // Map each vertex from (0,0):texRect -> (-1, -1):(0,0) => this show grid of points
+  // pos = (pos / (texRect)) - (1., 1.);
+  // gl_Position = vec4(pos, 1.0, 1.0);
+
 }
 `;
 
@@ -47,16 +63,21 @@ precision highp float;
 
 void main(void) {
   gl_FragColor = vec4(0.1, 0, 0, 1.0);
+  // gl_FragColor = vec4(1.0, 0, 0, 1.0); //-hack
 }
 `;
 
 const RENDER_POINTS_VS = `\
 attribute vec2 positions;
-uniform vec2 windowRect;
+uniform vec2 windowSize;
 void main(void) {
 
-  // Map each vertex from (0,0):windowRect -> (-1, -1):(1,1)
-  vec2 pos = (positions * (2., 2.) / (windowRect)) - (1., 1.);
+  // Map each vertex from (0,0):windowSize -> (-1, -1):(1,1)
+  vec2 pos = (positions * (2., 2.) / (windowSize)) - (1., 1.);
+
+  //hack remove
+  pos = pos + vec2(0.2, 0);
+
   gl_Position = vec4(pos, 1.0, 1.0);
 }
 `;
@@ -77,14 +98,15 @@ const RENDER_GRIDTEX_VS = `\
 attribute vec2 positions;
 attribute vec2 offsets;
 // attribute vec2 texCoords;
-uniform vec2 windowRect;
+uniform vec2 windowSize;
 varying vec2 vTextureCoord;
 void main(void) {
-  // Map each vertex from (0,0):windowRect -> (-1, -1):(1,1)
-  vec2 pos = ((positions + offsets) * (2., 2.) / (windowRect)) - (1., 1.);
+  // Map each vertex from (0,0):windowSize -> (-1, -1):(1,1)
+  vec2 pos = ((positions + offsets) * (2., 2.) / (windowSize)) - (1., 1.);
   gl_Position = vec4(pos, 1.0, 1.0);
 
-  vTextureCoord = vec2(0, 0); //texCoords;
+  // Position is in (-1, -1) to (1, 1) => texCord (0, 0) -> (1, 1)
+  vTextureCoord = (positions + offsets) / windowSize;
 }
 `;
 
@@ -100,7 +122,7 @@ void main(void) {
   vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
   // gl_FragColor = vec4(1.0, 0, 0, 1.0);
   // gl_FragColor = vec4(textureColor.rgb, 1.0);
-  gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+  gl_FragColor = vec4(textureColor.r, 0.0, 1.0, 1.0);
 }
 `;
 
@@ -134,6 +156,49 @@ void main(void) {
 }
 `;
 
+const SQUARE_TEX_VS = `\
+attribute vec2 positions;
+attribute vec2 texCoords;
+varying vec2 vTextureCoord;
+void main(void) {
+  gl_Position = vec4(positions, 1.0, 1.0);
+  vTextureCoord = vTextureCoord;
+}
+`;
+
+const SQUARE_TEX_FS = `\
+#ifdef GL_ES
+precision highp float;
+#endif
+
+varying vec2 vTextureCoord;
+uniform sampler2D uSampler;
+
+void main(void) {
+  vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+  gl_FragColor = vec4(textureColor.rgb, 1.0);
+}
+`;
+
+const SQUARE_WINDOW_SPACE_TEX_VS = `\
+attribute vec2 positions;
+uniform vec2 windowSize;
+varying vec2 vTextureCoord;
+void main(void) {
+
+  // Map each vertex from (0,0):windowSize -> (-1, -1):(1,1)
+  vec2 pos = (positions * (2., 2.) / (windowSize)) - (1., 1.);
+
+  // //hack remove
+  // pos = pos + vec2(0.2, 0);
+
+  gl_Position = vec4(pos, 1.0, 1.0);
+
+  vTextureCoord = vTextureCoord;
+}
+`;
+
+
 let gridFramebuffer;
 let girdAggregrationFramebuffer;
 
@@ -141,7 +206,9 @@ const animationLoop = new AnimationLoop({
   useDevicePixels: false,
   onInitialize({gl, canvas, aspect, width, height}) {
 
-    console.log(`Canvas W: ${width} H: ${height}`);
+    console.log(`W: ${width} H: ${height}`);
+    console.log(`canvas W: ${canvas.width} H: ${canvas.height}`);
+    console.log(`gl.canvas W: ${gl.canvas.width} H: ${gl.canvas.height}`);
 
     setParameters(gl, {
       clearColor: [0, 0, 0, 1],
@@ -155,161 +222,31 @@ const animationLoop = new AnimationLoop({
 //      blendColor: [1.0, 1.0, 1.0, 1.0],
     });
 
-    const pointCount = 1000;
-    // Get random points in (0, 0 ) -> (canvas.width, canvas.height)
-    let points = getRandomPoints({
-      x: 0,
-      y: 0,
-      width: canvas.width,
-      height: canvas.height,
-      count: pointCount / 2
-    });
-
-    const points2 = getRandomPoints({
-      x: 50,
-      y: 50,
-      width: 10,
-      height: 10,
-      count: pointCount / 2
-    });
-
-    points = points.concat(points2);
-
-    const boundingRect = getBoundingRect(points, pointCount);
-    // const canvasW = canvas.width;
-    // const canvasH = canvas.height;
-
-    const gridTexRectVertices = [1, 1,  -1, 1,  1, -1,  -1, -1];
-    const gridTexCoords = new Float32Array([
-      1.0, 1.0,
-      0.0, 1.0,
-      1.0, 0.0,
-      0.0, 0.0
-    ]);
-
-
-    const windowRect = [canvas.width, canvas.height];
-    const cellSize = [10, 10];
-    const gridSize = [
-      Math.floor(windowRect[0] / cellSize[0]),
-      Math.floor(windowRect[1] / cellSize[1])
-    ];
-
-    const gridVertices = generateVerticesForGrid(windowRect, cellSize);
-    const gridOffsetsData = generateOffsetsForGrid(windowRect, cellSize);
-
-    const gridTexPixels = getVertexPerEachPixel(gridSize);
-    const gridTexTexCoords = getTexCoordPerEachPixel(gridSize);
-
-    const pointPositions = new Buffer(gl, {size: 2, data: new Float32Array(points)});
-    const boundingRectPositions = new Buffer(gl, {size: 2, data: new Float32Array(boundingRect)});
-    const gridTexRectPositions = new Buffer(gl, {size: 2, data: new Float32Array(gridTexRectVertices)});
-    const gridTexRectTexCoords = new Buffer(gl, {size: 2, data: new Float32Array(gridTexCoords)});
-
-    const gridTexRectPixelPositions = new Buffer(gl, {size: 2, data: new Float32Array(gridTexPixels)});
-    const gridTexRectPixelTexCoords = new Buffer(gl, {size: 2, data: new Float32Array(gridTexTexCoords)});
-
-    //-TODO- use this to render grid
-    const gridPositions = new Buffer(gl, {size: 2, data: new Float32Array(gridVertices)});
-    const gridOffsets = new Buffer(gl, {size: 2, data: new Float32Array(gridOffsetsData), instanced: 1});
-
-    const girdTexGenerateModel = new Model(gl, {
-      id: 'Gird-Tex-Generation',
-      // vs: VERTEX_SHADER_POINTS,
-      vs: GENERATE_GRIDTEX_VS,
-      fs: GENERATE_GRIDTEX_FS,
-      attributes: {
-        positions: pointPositions
-      },
-      uniforms: {
-        windowRect,
-        cellSize
-      },
-      vertexCount: pointCount,
-      drawMode: GL.POINTS
-    });
-    const boundingRectModel = new Model(gl, {
-      id: 'BoundingRect-Model',
-      vs: VERTEX_SHADER_POINTS,
-      fs: GENERATE_GRIDTEX_FS,
-      attributes: {
-        positions: boundingRectPositions
-      },
-      uniforms: {
-        windowRect
-      },
-      vertexCount: 2,
-      drawMode: GL.LINES
-    });
-
-    const girdAggregationTexModel = new Model(gl, {
-      id: 'GridAggregationTexture-Model',
-      vs: AGGREGATE_SUM_GRIDTEX_VS,
-      fs: AGGREGATE_SUM_GRIDTEX_FS,
-      attributes: {
-        positions: gridTexRectPixelPositions,
-        texCoords: gridTexRectPixelTexCoords
-      },
-      vertexCount: gridTexPixels.length / 2,
-      drawMode: GL.POINTS
-    });
-
-    const girdTexRenderModel = new Model(gl, {
-      id: 'GridTexture-Render- Model',
-      vs: RENDER_GRIDTEX_VS,
-      fs: RENDER_GRIDTEX_FS,
-      attributes: {
-        positions: gridPositions,
-//        texCoords: gridTexRectTexCoords,
-        offsets: gridOffsets
-      },
-      uniforms: {
-        windowRect
-      },
-      isInstanced: 1,
-      instanceCount: gridOffsetsData.length / 2,
-      vertexCount: 4, //gridVertices.length / 2,
-      drawMode: GL.TRIANGLE_STRIP // GL.LINE_STRIP // TRIANGLE_STRIP
-    });
-
-    const pointsRenderModel = new Model(gl, {
-      id: 'Points-Render-Model',
-      // vs: VERTEX_SHADER_POINTS,
-      vs: RENDER_POINTS_VS,
-      fs: RENDER_POINTS_FS,
-      attributes: {
-        positions: pointPositions
-      },
-      uniforms: {
-        windowRect
-      },
-      vertexCount: pointCount,
-      drawMode: GL.POINTS
-    });
-
-    return {
-      girdTexGenerateModel,
-      boundingRectModel,
-      girdTexRenderModel,
-      girdAggregationTexModel,
-      pointsRenderModel,
-      cellSize,
-      gridSize
-    };
+    return buildModels({gl});
   },
   onRender(context) {
+    const gl = context.gl;
     const {
-      gl, girdTexGenerateModel, boundingRectModel, girdTexRenderModel,
-      cellSize, gridSize, girdAggregationTexModel, pointsRenderModel
+      girdTexGenerateModel, boundingRectModel, girdTexRenderModel,
+      gridSize, girdAggregationTexModel, pointsRenderModel,
+      squareTextureModel, squareWindowSpaceTextureModel
     } = context;
+
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     generateGridTexture(gl, {
       gridSize,
-      girdTexGenerateModel
+      girdTexGenerateModel,
+      renderToWindow: false
     });
 
-    girdTexRenderModel.render({
+    // girdTexRenderModel.render({
+    //   uSampler: gridFramebuffer.texture
+    // });
+    // squareTextureModel.render({
+    //   uSampler: gridFramebuffer.texture
+    // });
+    squareWindowSpaceTextureModel.render({
       uSampler: gridFramebuffer.texture
     });
 
@@ -322,16 +259,214 @@ const animationLoop = new AnimationLoop({
     //   uSampler: girdAggregrationFramebuffer.texture
     // });
 
-    // pointsRenderModel.render();
+    pointsRenderModel.render();
 
     return false;
   }
 });
 
+function buildModels(opts) {
+  const cellSize = [25, 25];
+  const {gl} = opts;
+  const canvas = gl.canvas;
+
+  const windowSize = [canvas.width, canvas.height];
+  const gridSize = [
+    Math.floor(windowSize[0] / cellSize[0]),
+    Math.floor(windowSize[1] / cellSize[1])
+  ];
+
+  console.log(`Window ${windowSize[0]}X${windowSize[1]}`);
+  console.log(`Cell ${cellSize[0]}X${cellSize[1]}`);
+  console.log(`Grid ${gridSize[0]}X${gridSize[1]}`);
+
+  const pointCount = 900;
+  // Get random points in (0, 0 ) -> (canvas.width, canvas.height)
+  let points = getRandomPoints({
+    x: 0,
+    y: 0,
+    width: windowSize[0],
+    height: windowSize[1],
+    count: pointCount / 3
+  });
+
+  const points2 = getRandomPoints({
+    x: 900,
+    y: 500,
+    width: 25,
+    height: 25,
+    count: pointCount / 3
+  });
+
+  const points3 = getRandomPoints({
+    x: 0,
+    y: 0,
+    width: 25,
+    height: 25,
+    count: pointCount / 3
+  });
+
+  points = points.concat(points2);
+  points = points.concat(points3);
+
+  const boundingRect = getBoundingRect(points, pointCount);
+  // const canvasW = canvas.width;
+  // const canvasH = canvas.height;
+
+  const gridTexRectVertices = [1, 1,  -1, 1,  1, -1,  -1, -1];
+  const gridTexRectWindowSpaceVertices = [
+    gridSize[0], gridSize[1],
+    0, gridSize[1],
+    gridSize[0], 0,
+    0, 0
+  ];
+  const gridTexCoords = new Float32Array([
+    1.0, 1.0,
+    0.0, 1.0,
+    1.0, 0.0,
+    0.0, 0.0
+  ]);
+  const gridVertices = generateVerticesForGrid(windowSize, cellSize);
+  const gridOffsetsData = generateOffsetsForGrid(windowSize, cellSize);
+
+  const gridTexPixels = getVertexPerEachPixel(gridSize);
+  const gridTexTexCoords = getTexCoordPerEachPixel(gridSize);
+
+  const pointPositions = new Buffer(gl, {size: 2, data: new Float32Array(points)});
+  const boundingRectPositions = new Buffer(gl, {size: 2, data: new Float32Array(boundingRect)});
+  const gridTexRectPositions = new Buffer(gl, {size: 2, data: new Float32Array(gridTexRectVertices)});
+  const gridTexRectTexCoords = new Buffer(gl, {size: 2, data: new Float32Array(gridTexCoords)});
+
+  const gridTexRectPixelPositions = new Buffer(gl, {size: 2, data: new Float32Array(gridTexPixels)});
+  const gridTexRectPixelTexCoords = new Buffer(gl, {size: 2, data: new Float32Array(gridTexTexCoords)});
+
+  //-TODO- use this to render grid
+  const gridPositions = new Buffer(gl, {size: 2, data: new Float32Array(gridVertices)});
+  const gridOffsets = new Buffer(gl, {size: 2, data: new Float32Array(gridOffsetsData), instanced: 1});
+
+  const squarePositions = new Buffer(gl, {size: 2, data: new Float32Array(gridTexRectVertices)});
+  const squareWindowSpacePositions = new Buffer(gl, {size: 2, data: new Float32Array(gridTexRectWindowSpaceVertices)});
+  const squareTexCoords = new Buffer(gl, {size: 2, data: new Float32Array(gridTexCoords)});
+
+  const girdTexGenerateModel = new Model(gl, {
+    id: 'Gird-Tex-Generation',
+    // vs: VERTEX_SHADER_POINTS,
+    vs: GENERATE_GRIDTEX_VS,
+    fs: GENERATE_GRIDTEX_FS,
+    attributes: {
+      positions: pointPositions
+    },
+    uniforms: {
+      windowSize,
+      cellSize
+    },
+    vertexCount: pointCount,
+    drawMode: GL.POINTS
+  });
+  const boundingRectModel = new Model(gl, {
+    id: 'BoundingRect-Model',
+    vs: VERTEX_SHADER_POINTS,
+    fs: GENERATE_GRIDTEX_FS,
+    attributes: {
+      positions: boundingRectPositions
+    },
+    uniforms: {
+      windowSize
+    },
+    vertexCount: 2,
+    drawMode: GL.LINES
+  });
+
+  const girdAggregationTexModel = new Model(gl, {
+    id: 'GridAggregationTexture-Model',
+    vs: AGGREGATE_SUM_GRIDTEX_VS,
+    fs: AGGREGATE_SUM_GRIDTEX_FS,
+    attributes: {
+      positions: gridTexRectPixelPositions,
+      texCoords: gridTexRectPixelTexCoords
+    },
+    vertexCount: gridTexPixels.length / 2,
+    drawMode: GL.POINTS
+  });
+
+  const girdTexRenderModel = new Model(gl, {
+    id: 'GridTexture-Render- Model',
+    vs: RENDER_GRIDTEX_VS,
+    fs: RENDER_GRIDTEX_FS,
+    attributes: {
+      positions: gridPositions,
+//        texCoords: gridTexRectTexCoords,
+      offsets: gridOffsets
+    },
+    uniforms: {
+      windowSize
+    },
+    isInstanced: 1,
+    instanceCount: gridOffsetsData.length / 2,
+    vertexCount: 4, //gridVertices.length / 2,
+    drawMode: GL.TRIANGLE_STRIP // GL.LINE_STRIP // TRIANGLE_STRIP
+  });
+
+  const pointsRenderModel = new Model(gl, {
+    id: 'Points-Render-Model',
+    // vs: VERTEX_SHADER_POINTS,
+    vs: RENDER_POINTS_VS,
+    fs: RENDER_POINTS_FS,
+    attributes: {
+      positions: pointPositions
+    },
+    uniforms: {
+      windowSize
+    },
+    vertexCount: pointCount,
+    drawMode: GL.POINTS
+  });
+
+  const squareTextureModel = new Model(gl, {
+    id: 'Square-Tex-Model',
+    vs: SQUARE_TEX_VS,
+    fs: SQUARE_TEX_FS,
+    attributes: {
+      positions: squarePositions,
+      texCoords: squareTexCoords
+    },
+    vertexCount: 4,
+    drawMode: GL.TRIANGLE_STRIP
+  });
+
+  const squareWindowSpaceTextureModel = new Model(gl, {
+    id: 'Square-Tex-Model',
+    vs: SQUARE_WINDOW_SPACE_TEX_VS,
+    fs: SQUARE_TEX_FS, // RENDER_POINTS_FS,
+    attributes: {
+      positions: squareWindowSpacePositions,
+      texCoords: squareTexCoords
+    },
+    uniforms: {
+      windowSize
+    },
+    vertexCount: 4,
+    drawMode: GL.TRIANGLE_STRIP
+  });
+
+  girdAggregrationFramebuffer = setupFramebuffer(gl, {gridSize, id: 'GridAggregation'});
+  gridFramebuffer = setupFramebuffer(gl, {gridSize, id: 'Grid'});
+
+  return {
+    girdTexGenerateModel,
+    boundingRectModel,
+    girdTexRenderModel,
+    girdAggregationTexModel,
+    pointsRenderModel,
+    squareTextureModel,
+    squareWindowSpaceTextureModel,
+    cellSize,
+    gridSize
+  };
+}
+
 function generateGridAggregationTexture(gl, opts) {
   const {gridSize, girdAggregationTexModel} = opts;
-
-  girdAggregrationFramebuffer = setupFramebuffer(gl, {gridSize});
 
   girdAggregationTexModel.draw({
     framebuffer: girdAggregrationFramebuffer,
@@ -348,14 +483,14 @@ function generateGridAggregationTexture(gl, opts) {
 }
 
 function generateGridTexture(gl, opts) {
-  const {gridSize, girdTexGenerateModel} = opts;
+  const {gridSize, girdTexGenerateModel, renderToWindow} = opts;
 
-  gridFramebuffer = setupFramebuffer(gl, {gridSize});
+  //-TODO- : verif this
 
   girdTexGenerateModel.draw({
-    framebuffer: gridFramebuffer,
+    framebuffer: renderToWindow ? null : gridFramebuffer,
     parameters: {
-      clearColor: [0, 0, 0, 0],
+      clearColor: [0, 0, 0.2, 0],
       clearDepth: 0
     }
   });
@@ -363,7 +498,7 @@ function generateGridTexture(gl, opts) {
 }
 
 function setupFramebuffer(gl, opts) {
-  const {gridSize} = opts;
+  const {gridSize, id} = opts;
   const rttTexture = new Texture2D(gl, {
     data: null,
     format: GL.RGBA,
@@ -386,6 +521,7 @@ function setupFramebuffer(gl, opts) {
   });
 
   const rttFramebuffer = new Framebuffer(gl, {
+    id,
     width: gridSize[0],
     height: gridSize[1],
     attachments: {
@@ -430,23 +566,23 @@ function getTexCoordPerEachPixel(rectSize) {
 }
 
 function generateTriangleVerticesInRect(start, end) {
-  start[0] = start[0] + MARGIN;
-  start[1] = start[1] + MARGIN;
-  end[0] = end[0] - MARGIN;
-  end[1] = end[1] - MARGIN;
+  const startX = start[0] + MARGIN;
+  const startY = start[1] + MARGIN;
+  const endX = end[0] - MARGIN;
+  const endY = end[1] - MARGIN;
 
   // [1, 1,  -1, 1,  1, -1,  -1, -1];
   // [1, 1,  -1, 1,  1, -1,  -1, -1]
-  return [end[0], end[1],  start[0], end[1],  end[0], start[1], start[0], start[1]]
+  return [endX, endY,  startX, endY,  endX, startY, startX, startY];
 }
 
-function generateVerticesForGrid(windowRect, cellSize) {
+function generateVerticesForGrid(windowSize, cellSize) {
 
   // let points = [];
   // let xOffset = 0;
   // let yOffset = 0;
-  // for (let x = 0; x < windowRect[0]; x = x + cellSize[0]) {
-  //   for (let y = 0; y < windowRect[1]; y = y + cellSize[1]) {
+  // for (let x = 0; x < windowSize[0]; x = x + cellSize[0]) {
+  //   for (let y = 0; y < windowSize[1]; y = y + cellSize[1]) {
   //     const newPoints = generateTriangleVerticesInRect([x, y], [x + cellSize[0], y + cellSize[1]]);
   //     points = points.concat(newPoints);
   //   }
@@ -455,11 +591,11 @@ function generateVerticesForGrid(windowRect, cellSize) {
   return generateTriangleVerticesInRect([0, 0], cellSize);
 }
 
-function generateOffsetsForGrid(windowRect, cellSize) {
+function generateOffsetsForGrid(windowSize, cellSize) {
 
   const offsets = [];
-  for (let x = 0; x < windowRect[0]; x = x + cellSize[0]) {
-    for (let y = 0; y < windowRect[1]; y = y + cellSize[1]) {
+  for (let x = 0; x < windowSize[0]; x = x + cellSize[0]) {
+    for (let y = 0; y < windowSize[1]; y = y + cellSize[1]) {
       // const newPoints = generateTriangleVerticesInRect([x, y], [x + cellSize[0], y + cellSize[1]]);
       offsets.push(x, y);
     }

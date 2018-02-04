@@ -202,6 +202,7 @@ export default class AnimationLoop {
     this._callbackData.width = canvas.width;
     this._callbackData.height = canvas.height;
     this._callbackData.aspect = canvas.width / canvas.height;
+    // console.log(`AnimationLoop updateCallbackData W: ${this._callbackData.width} H: ${this._callbackData.height}`);
   }
 
   _finalizeCallbackData() {

@@ -532,7 +532,7 @@ export default class Framebuffer extends Resource {
   }
 
   log({priority = 0, message = ''} = {}) {
-    if (priority > log.priority || typeof window === 'undefined') {
+    if (typeof window === 'undefined') {
       return this;
     }
     message = message || `Framebuffer ${this.id}`;

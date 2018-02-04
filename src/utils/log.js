@@ -6,7 +6,7 @@ console.debug = console.debug || console.log;
 const cache = {};
 
 const log = {
-  priority: 4,
+  priority: 0, //4, // 0, // 4,
   table(priority, table) {
     if (priority <= log.priority && table) {
       console.table(table);
@@ -38,9 +38,9 @@ const log = {
     console.error(`luma.gl: ${arg}`, ...args);
   },
   image({priority, image, message = '', scale = 1}) {
-    if (priority > log.priority) {
-      return;
-    }
+    // if (priority > log.priority) {
+    //   return;
+    // }
     if (typeof window === 'undefined') { // Let's not try this under node
       return;
     }

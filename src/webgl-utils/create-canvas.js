@@ -154,4 +154,5 @@ export function resizeDrawingBuffer(canvas, {
     // canvas.style.width = `${cssSize.width}px`;
     // canvas.style.height = `${cssSize.height}px`;
   }
+  console.log(`resizeDrawingBuffer : useDevicePixels: ${useDevicePixels} W: ${canvas.width} H: ${canvas.height}`);
 }
