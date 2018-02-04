@@ -75,8 +75,8 @@ void main(void) {
   // Map each vertex from (0,0):windowSize -> (-1, -1):(1,1)
   vec2 pos = (positions * (2., 2.) / (windowSize)) - (1., 1.);
 
-  //hack remove
-  pos = pos + vec2(0.2, 0);
+  // //-hack remove
+  // pos = pos + vec2(0.2, 0);
 
   gl_Position = vec4(pos, 1.0, 1.0);
 }
@@ -122,7 +122,7 @@ void main(void) {
   vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
   // gl_FragColor = vec4(1.0, 0, 0, 1.0);
   // gl_FragColor = vec4(textureColor.rgb, 1.0);
-  gl_FragColor = vec4(textureColor.r, 0.0, 1.0, 1.0);
+  gl_FragColor = vec4(textureColor.r, 0.0, 0.0, 1.0);
 }
 `;
 
@@ -240,15 +240,15 @@ const animationLoop = new AnimationLoop({
       renderToWindow: false
     });
 
-    // girdTexRenderModel.render({
-    //   uSampler: gridFramebuffer.texture
-    // });
+    girdTexRenderModel.render({
+      uSampler: gridFramebuffer.texture
+    });
     // squareTextureModel.render({
     //   uSampler: gridFramebuffer.texture
     // });
-    squareWindowSpaceTextureModel.render({
-      uSampler: gridFramebuffer.texture
-    });
+    // squareWindowSpaceTextureModel.render({
+    //   uSampler: gridFramebuffer.texture
+    // });
 
     // generateGridAggregationTexture(gl, {
     //   gridSize,
@@ -280,7 +280,38 @@ function buildModels(opts) {
   console.log(`Cell ${cellSize[0]}X${cellSize[1]}`);
   console.log(`Grid ${gridSize[0]}X${gridSize[1]}`);
 
-  const pointCount = 900;
+  // const pointCount = 900;
+  const pointsData = [
+    {
+      x: 0,
+      y: 0,
+      width: windowSize[0],
+      height: windowSize[1],
+      count: 10
+    },
+    {
+      x: 900,
+      y: 500,
+      width: 25,
+      height: 25,
+      count: 100
+    },
+    {
+      x: 0,
+      y: 0,
+      width: 25,
+      height: 25,
+      count: 100
+    }
+  ];
+
+  let points = [];
+  for (const ptData of pointsData) {
+    const pts = getRandomPoints(ptData);
+    points = points.concat(pts);
+  }
+  const pointCount = points.length / 2;
+  /*
   // Get random points in (0, 0 ) -> (canvas.width, canvas.height)
   let points = getRandomPoints({
     x: 0,
@@ -308,6 +339,7 @@ function buildModels(opts) {
 
   points = points.concat(points2);
   points = points.concat(points3);
+  */
 
   const boundingRect = getBoundingRect(points, pointCount);
   // const canvasW = canvas.width;
@@ -473,7 +505,8 @@ function generateGridAggregationTexture(gl, opts) {
     parameters: {
       clearColor: [0, 0, 0, 0],
       clearDepth: 0,
-      blendEquation: [GL.FUNC_ADD, GL.MAX]
+      blendEquation: [GL.FUNC_ADD, GL.MAX],
+      viewport: [0, 0, 1, 1]
     },
     uniforms: {
       uSampler: gridFramebuffer.texture
@@ -491,7 +524,10 @@ function generateGridTexture(gl, opts) {
     framebuffer: renderToWindow ? null : gridFramebuffer,
     parameters: {
       clearColor: [0, 0, 0.2, 0],
-      clearDepth: 0
+      clearDepth: 0,
+      viewport: [0, 0, gridSize[0], gridSize[1]],
+      blend: true,
+      blendEquation: GL.FUNC_ADD
     }
   });
 
@@ -620,6 +656,9 @@ animationLoop.getInfo = () => {
 // Result count number of points in an array , each point (x, y)
 // such that  origin.x <= x < orgin.x + width
 function getRandomPoints(opts) {
+  if (opts.count === 0) {
+    return [];
+  }
   assert(
     Number.isFinite(opts.x) &&
     Number.isFinite(opts.y) &&
