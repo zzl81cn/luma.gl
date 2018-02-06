@@ -62,7 +62,7 @@ precision highp float;
 #endif
 
 void main(void) {
-  gl_FragColor = vec4(0.1, 0, 0, 1.0);
+  gl_FragColor = vec4(0.05, 0, 0, 1.0);
   // gl_FragColor = vec4(1.0, 0, 0, 1.0); //-hack
 }
 `;
@@ -123,6 +123,10 @@ void main(void) {
   // gl_FragColor = vec4(1.0, 0, 0, 1.0);
   // gl_FragColor = vec4(textureColor.rgb, 1.0);
   gl_FragColor = vec4(textureColor.r, 0.0, 0.0, 1.0);
+
+  //-hack- remove => tex coords are fine , range form (0,0) -> (1, 1)
+  // gl_FragColor = vec4(vTextureCoord, 0.0, 1.0);
+
 }
 `;
 
@@ -240,8 +244,13 @@ const animationLoop = new AnimationLoop({
       renderToWindow: false
     });
 
-    girdTexRenderModel.render({
-      uSampler: gridFramebuffer.texture
+    girdTexRenderModel.draw({
+      uniforms: {
+        uSampler: gridFramebuffer.texture
+      },
+      parameters: {
+        blend: false
+      }
     });
     // squareTextureModel.render({
     //   uSampler: gridFramebuffer.texture
@@ -259,7 +268,11 @@ const animationLoop = new AnimationLoop({
     //   uSampler: girdAggregrationFramebuffer.texture
     // });
 
-    pointsRenderModel.render();
+    pointsRenderModel.draw({
+      parameters: {
+        blend: false
+      }
+    });
 
     return false;
   }
@@ -287,17 +300,17 @@ function buildModels(opts) {
       y: 0,
       width: windowSize[0],
       height: windowSize[1],
-      count: 10
+      count: 10000
     },
     {
-      x: 900,
-      y: 500,
+      x: 400,
+      y: 100,
       width: 25,
       height: 25,
-      count: 100
+      count: 25
     },
     {
-      x: 0,
+      x: 600,
       y: 0,
       width: 25,
       height: 25,
@@ -519,17 +532,23 @@ function generateGridTexture(gl, opts) {
   const {gridSize, girdTexGenerateModel, renderToWindow} = opts;
 
   //-TODO- : verif this
+  gridFramebuffer.bind();
+
+  gl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
   girdTexGenerateModel.draw({
-    framebuffer: renderToWindow ? null : gridFramebuffer,
+    // framebuffer: renderToWindow ? null : gridFramebuffer,
     parameters: {
-      clearColor: [0, 0, 0.2, 0],
+      clearColor: [0, 0, 0, 0],
       clearDepth: 0,
-      viewport: [0, 0, gridSize[0], gridSize[1]],
+      viewport: [0, 0, gridSize[0], gridSize[1]], // -hack- enable this line
       blend: true,
-      blendEquation: GL.FUNC_ADD
+      blendEquation: GL.FUNC_ADD,
+      blendFunc: [GL.ONE, GL.ONE]
     }
   });
+
+  gridFramebuffer.unbind();
 
 }
 
