@@ -166,7 +166,7 @@ attribute vec2 texCoords;
 varying vec2 vTextureCoord;
 void main(void) {
   gl_Position = vec4(positions, 1.0, 1.0);
-  vTextureCoord = vTextureCoord;
+  vTextureCoord = texCoords;
 }
 `;
 
@@ -181,12 +181,14 @@ uniform sampler2D uSampler;
 void main(void) {
   vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
   gl_FragColor = vec4(textureColor.rgb, 1.0);
+  // gl_FragColor = vec4(vTextureCoord.st, 0.0, 1.0);
 }
 `;
 
 const SQUARE_WINDOW_SPACE_TEX_VS = `\
 attribute vec2 positions;
 uniform vec2 windowSize;
+attribute vec2 texCoords;
 varying vec2 vTextureCoord;
 void main(void) {
 
@@ -198,7 +200,7 @@ void main(void) {
 
   gl_Position = vec4(pos, 1.0, 1.0);
 
-  vTextureCoord = vTextureCoord;
+  vTextureCoord = texCoords;
 }
 `;
 
@@ -246,15 +248,7 @@ const animationLoop = new AnimationLoop({
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    girdTexRenderModel.draw({
-      uniforms: {
-        uSampler: gridFramebuffer.texture
-      },
-      parameters: {
-        blend: false
-      }
-    });
-    // squareTextureModel.draw({
+    // girdTexRenderModel.draw({
     //   uniforms: {
     //     uSampler: gridFramebuffer.texture
     //   },
@@ -262,6 +256,14 @@ const animationLoop = new AnimationLoop({
     //     blend: false
     //   }
     // });
+    squareTextureModel.draw({
+      uniforms: {
+        uSampler: gridFramebuffer.texture
+      },
+      parameters: {
+        blend: false
+      }
+    });
     // squareWindowSpaceTextureModel.draw({
     //   uniforms: {
     //     uSampler: gridFramebuffer.texture
@@ -305,34 +307,34 @@ function buildModels(opts) {
   console.log(`Cell ${cellSize[0]}X${cellSize[1]}`);
   console.log(`Grid ${gridSize[0]}X${gridSize[1]}`);
 
-  const xMargin = 5;
-  const yMargin = 5;
+  const xMargin = 20;
+  const yMargin = 20;
   let count = 10;
   const pointsData = [];
   const numberOfGrids = 10;
   let gridCount = 0;
-  for (let x = 0; (x < windowSize[0]) & (gridCount < numberOfGrids); x += cellSize[0]) {
-    for (let y = 0; (y < windowSize[1]) & (gridCount < numberOfGrids); y += cellSize[1]) {
-      pointsData.push({
-        x: x + xMargin,
-        y: y + yMargin,
-        width: cellSize[0] - xMargin,
-        height: cellSize[1] - xMargin,
-        count
-      });
-      count += 1;
-      gridCount++;
-    }
-  }
+
+  // for (let x = 0; (x < windowSize[0]) & (gridCount < numberOfGrids); x += cellSize[0]) {
+  //   for (let y = 0; (y < windowSize[1]) & (gridCount < numberOfGrids); y += cellSize[1]) {
+  //     pointsData.push({
+  //       x: x + xMargin,
+  //       y: y + yMargin,
+  //       width: cellSize[0] - 2 * xMargin,
+  //       height: cellSize[1] - 2 * yMargin,
+  //       count
+  //     });
+  //     count += 1;
+  //     gridCount++;
+  //   }
+  // }
   // const pointCount = 900;
-  // const pointsData = [
-  //   {
-  //     x: 0,
-  //     y: 0,
-  //     width: windowSize[0],
-  //     height: windowSize[1],
-  //     count: 500
-  //   },
+  pointsData.push({
+    x: 0,
+    y: 0,
+    width: windowSize[0],
+    height: windowSize[1],
+    count: 1000
+  });
   //   {
   //     x: 0,
   //     y: 0,
@@ -431,12 +433,12 @@ function buildModels(opts) {
     gridSize[0], 0,
     0, 0
   ];
-  const gridTexCoords = new Float32Array([
+  const gridTexCoords = [
     1.0, 1.0,
     0.0, 1.0,
     1.0, 0.0,
     0.0, 0.0
-  ]);
+  ];
   const gridVertices = generateVerticesForGrid(windowSize, cellSize);
   const gridOffsetsData = generateOffsetsForGrid(windowSize, cellSize);
 
