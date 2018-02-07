@@ -236,13 +236,15 @@ const animationLoop = new AnimationLoop({
       squareTextureModel, squareWindowSpaceTextureModel
     } = context;
 
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     generateGridTexture(gl, {
       gridSize,
       girdTexGenerateModel,
       renderToWindow: false
     });
+
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     girdTexRenderModel.draw({
       uniforms: {
@@ -252,11 +254,21 @@ const animationLoop = new AnimationLoop({
         blend: false
       }
     });
-    // squareTextureModel.render({
-    //   uSampler: gridFramebuffer.texture
+    // squareTextureModel.draw({
+    //   uniforms: {
+    //     uSampler: gridFramebuffer.texture
+    //   },
+    //   parameters: {
+    //     blend: false
+    //   }
     // });
-    // squareWindowSpaceTextureModel.render({
-    //   uSampler: gridFramebuffer.texture
+    // squareWindowSpaceTextureModel.draw({
+    //   uniforms: {
+    //     uSampler: gridFramebuffer.texture
+    //   },
+    //   parameters: {
+    //     blend: false
+    //   }
     // });
 
     // generateGridAggregationTexture(gl, {
@@ -279,7 +291,7 @@ const animationLoop = new AnimationLoop({
 });
 
 function buildModels(opts) {
-  const cellSize = [25, 25];
+  const cellSize = [50, 50];
   const {gl} = opts;
   const canvas = gl.canvas;
 
@@ -293,30 +305,84 @@ function buildModels(opts) {
   console.log(`Cell ${cellSize[0]}X${cellSize[1]}`);
   console.log(`Grid ${gridSize[0]}X${gridSize[1]}`);
 
-  // const pointCount = 900;
-  const pointsData = [
-    {
-      x: 0,
-      y: 0,
-      width: windowSize[0],
-      height: windowSize[1],
-      count: 10000
-    },
-    {
-      x: 400,
-      y: 100,
-      width: 25,
-      height: 25,
-      count: 25
-    },
-    {
-      x: 600,
-      y: 0,
-      width: 25,
-      height: 25,
-      count: 100
+  const xMargin = 5;
+  const yMargin = 5;
+  let count = 10;
+  const pointsData = [];
+  const numberOfGrids = 10;
+  let gridCount = 0;
+  for (let x = 0; (x < windowSize[0]) & (gridCount < numberOfGrids); x += cellSize[0]) {
+    for (let y = 0; (y < windowSize[1]) & (gridCount < numberOfGrids); y += cellSize[1]) {
+      pointsData.push({
+        x: x + xMargin,
+        y: y + yMargin,
+        width: cellSize[0] - xMargin,
+        height: cellSize[1] - xMargin,
+        count
+      });
+      count += 1;
+      gridCount++;
     }
-  ];
+  }
+  // const pointCount = 900;
+  // const pointsData = [
+  //   {
+  //     x: 0,
+  //     y: 0,
+  //     width: windowSize[0],
+  //     height: windowSize[1],
+  //     count: 500
+  //   },
+  //   {
+  //     x: 0,
+  //     y: 0,
+  //     width: 50,
+  //     height: 50,
+  //     count: 0
+  //   },
+  //   {
+  //     x: 50 + xMargin,
+  //     y: 0,
+  //     width: 50 - xMargin,
+  //     height: 50,
+  //     count: 20
+  //   },
+  //   {
+  //     x: 100,
+  //     y: 0,
+  //     width: 50,
+  //     height: 50,
+  //     count: 0
+  //   },
+  //   {
+  //     x: 150 + xMargin,
+  //     y: 0,
+  //     width: 50 - 2 * xMargin,
+  //     height: 50,
+  //     count: 40
+  //   },
+  //   {
+  //     x: 200,
+  //     y: 0,
+  //     width: 50,
+  //     height: 50,
+  //     count: 0
+  //   },
+  //   {
+  //     x: 250 + xMargin,
+  //     y: 0,
+  //     width: 50 - 2 * xMargin,
+  //     height: 50,
+  //     count: 60
+  //   },
+  //   {
+  //     x: 300 + xMargin,
+  //     y: 0,
+  //     width: 50 - 2 * xMargin,
+  //     height: 50,
+  //     count: 120
+  //   }
+  // ];
 
   let points = [];
   for (const ptData of pointsData) {
@@ -534,14 +600,15 @@ function generateGridTexture(gl, opts) {
   //-TODO- : verif this
   gridFramebuffer.bind();
 
-  gl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+  gl.viewport(0, 0, gridSize[0], gridSize[1]);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   girdTexGenerateModel.draw({
     // framebuffer: renderToWindow ? null : gridFramebuffer,
     parameters: {
       clearColor: [0, 0, 0, 0],
       clearDepth: 0,
-      viewport: [0, 0, gridSize[0], gridSize[1]], // -hack- enable this line
+      // viewport: [0, 0, gridSize[0], gridSize[1]], // -hack- enable this line
       blend: true,
       blendEquation: GL.FUNC_ADD,
       blendFunc: [GL.ONE, GL.ONE]
