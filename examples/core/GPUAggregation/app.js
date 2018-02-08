@@ -36,6 +36,11 @@ void main(void) {
 
   // Map each vertex from (0,0):texRect -> (-1, -1):(1,1)
   pos = (pos * (2., 2.) / (texRect)) - (1., 1.);
+
+  // Adding an offset of 0.5 pixel, in screen space 2/texRect * 0.5 => 1/texRect
+  vec2 offset = 1.0 / texRect;
+  pos = pos + offset;
+  
   gl_Position = vec4(pos, 1.0, 1.0);
 
   // //-hack remove this code
@@ -624,7 +629,7 @@ function setupFramebuffer(gl, opts) {
   const rttTexture = new Texture2D(gl, {
     data: null,
     format: GL.RGBA,
-    type: GL.UNSIGNED_INT,
+    type: GL.UNSIGNED_BYTE,
     border: 0,
     mipmaps: false,
     parameters: {
