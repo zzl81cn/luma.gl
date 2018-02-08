@@ -62,7 +62,7 @@ precision highp float;
 #endif
 
 void main(void) {
-  gl_FragColor = vec4(0.05, 0, 0, 1.0);
+  gl_FragColor = vec4(0.005, 0, 0, 1.0);
   // gl_FragColor = vec4(1.0, 0, 0, 1.0); //-hack
 }
 `;
@@ -311,30 +311,30 @@ function buildModels(opts) {
   const yMargin = 20;
   let count = 10;
   const pointsData = [];
-  const numberOfGrids = 10;
+  const numberOfGrids = 360;
   let gridCount = 0;
 
-  // for (let x = 0; (x < windowSize[0]) & (gridCount < numberOfGrids); x += cellSize[0]) {
-  //   for (let y = 0; (y < windowSize[1]) & (gridCount < numberOfGrids); y += cellSize[1]) {
-  //     pointsData.push({
-  //       x: x + xMargin,
-  //       y: y + yMargin,
-  //       width: cellSize[0] - 2 * xMargin,
-  //       height: cellSize[1] - 2 * yMargin,
-  //       count
-  //     });
-  //     count += 1;
-  //     gridCount++;
-  //   }
-  // }
-  // const pointCount = 900;
-  pointsData.push({
-    x: 0,
-    y: 0,
-    width: windowSize[0],
-    height: windowSize[1],
-    count: 1000
-  });
+  const borderOffset = 2;
+  for (let y = cellSize[1]*borderOffset; (y < windowSize[1] - cellSize[1]*borderOffset) & (gridCount < numberOfGrids); y += cellSize[1]) {
+    for (let x = cellSize[0]*borderOffset; (x < windowSize[0]- cellSize[0]*borderOffset) & (gridCount < numberOfGrids); x += cellSize[0]) {
+      pointsData.push({
+        x: x + xMargin,
+        y: y + yMargin,
+        width: cellSize[0] - 2 * xMargin,
+        height: cellSize[1] - 2 * yMargin,
+        count
+      });
+      count += 1;
+      gridCount++;
+    }
+  }
+  // pointsData.push({
+  //   x: 0,
+  //   y: 0,
+  //   width: windowSize[0],
+  //   height: windowSize[1],
+  //   count: 1000
+  // });
   //   {
   //     x: 0,
   //     y: 0,
@@ -606,11 +606,9 @@ function generateGridTexture(gl, opts) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   girdTexGenerateModel.draw({
-    // framebuffer: renderToWindow ? null : gridFramebuffer,
     parameters: {
       clearColor: [0, 0, 0, 0],
       clearDepth: 0,
-      // viewport: [0, 0, gridSize[0], gridSize[1]], // -hack- enable this line
       blend: true,
       blendEquation: GL.FUNC_ADD,
       blendFunc: [GL.ONE, GL.ONE]
@@ -626,7 +624,7 @@ function setupFramebuffer(gl, opts) {
   const rttTexture = new Texture2D(gl, {
     data: null,
     format: GL.RGBA,
-    type: GL.UNSIGNED_BYTE,
+    type: GL.UNSIGNED_INT,
     border: 0,
     mipmaps: false,
     parameters: {
