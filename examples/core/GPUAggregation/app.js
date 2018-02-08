@@ -40,7 +40,7 @@ void main(void) {
   // Adding an offset of 0.5 pixel, in screen space 2/texRect * 0.5 => 1/texRect
   vec2 offset = 1.0 / texRect;
   pos = pos + offset;
-  
+
   gl_Position = vec4(pos, 1.0, 1.0);
 
   // //-hack remove this code
@@ -67,7 +67,7 @@ precision highp float;
 #endif
 
 void main(void) {
-  gl_FragColor = vec4(0.005, 0, 0, 1.0);
+  gl_FragColor = vec4(1./255., 0, 0, 1.0);
   // gl_FragColor = vec4(1.0, 0, 0, 1.0); //-hack
 }
 `;
@@ -104,7 +104,14 @@ attribute vec2 positions;
 attribute vec2 offsets;
 // attribute vec2 texCoords;
 uniform vec2 windowSize;
+uniform vec2 texSize;
+
+uniform sampler2D uSampler;
+
 varying vec2 vTextureCoord;
+varying vec4 vTextureColor;
+
+
 void main(void) {
   // Map each vertex from (0,0):windowSize -> (-1, -1):(1,1)
   vec2 pos = ((positions + offsets) * (2., 2.) / (windowSize)) - (1., 1.);
@@ -112,6 +119,12 @@ void main(void) {
 
   // Position is in (-1, -1) to (1, 1) => texCord (0, 0) -> (1, 1)
   vTextureCoord = (positions + offsets) / windowSize;
+
+  // Add 0.5 offset to coordinate (1/texSize * 0.5)
+  // vTextureCoord = vTextureCoord + (0.5 / texSize);
+
+  vTextureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+
 }
 `;
 
@@ -121,6 +134,7 @@ precision highp float;
 #endif
 
 varying vec2 vTextureCoord;
+varying vec4 vTextureColor;
 uniform sampler2D uSampler;
 
 void main(void) {
@@ -255,7 +269,8 @@ const animationLoop = new AnimationLoop({
 
     // girdTexRenderModel.draw({
     //   uniforms: {
-    //     uSampler: gridFramebuffer.texture
+    //     uSampler: gridFramebuffer.texture,
+    //     texSize: [gridFramebuffer.texture.width, gridFramebuffer.texture.height]
     //   },
     //   parameters: {
     //     blend: false
@@ -312,14 +327,14 @@ function buildModels(opts) {
   console.log(`Cell ${cellSize[0]}X${cellSize[1]}`);
   console.log(`Grid ${gridSize[0]}X${gridSize[1]}`);
 
-  const xMargin = 20;
-  const yMargin = 20;
-  let count = 10;
+  const xMargin = 1;
+  const yMargin = 1;
+  let count = 1;
   const pointsData = [];
   const numberOfGrids = 360;
   let gridCount = 0;
 
-  const borderOffset = 2;
+  const borderOffset = 0;
   for (let y = cellSize[1]*borderOffset; (y < windowSize[1] - cellSize[1]*borderOffset) & (gridCount < numberOfGrids); y += cellSize[1]) {
     for (let x = cellSize[0]*borderOffset; (x < windowSize[0]- cellSize[0]*borderOffset) & (gridCount < numberOfGrids); x += cellSize[0]) {
       pointsData.push({
@@ -517,7 +532,8 @@ function buildModels(opts) {
       offsets: gridOffsets
     },
     uniforms: {
-      windowSize
+      windowSize,
+      cellSize
     },
     isInstanced: 1,
     instanceCount: gridOffsetsData.length / 2,
