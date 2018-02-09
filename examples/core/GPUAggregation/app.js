@@ -9,7 +9,8 @@ import assert from 'assert';
 /* eslint-disable no-console */
 
 const MARGIN = 2; // pixels
-
+const USE_FLOAT_TEXTURES = true;
+const CELL_SIZE = [35, 35];
 const VERTEX_SHADER_POINTS = `\
 attribute vec2 positions;
 uniform vec2 windowSize;
@@ -19,7 +20,6 @@ void main(void) {
   gl_Position = vec4(pos, 1.0, 1.0);
 }
 `;
-
 
 const GENERATE_GRIDTEX_VS = `\
 attribute vec2 positions;
@@ -73,6 +73,16 @@ void main(void) {
 }
 `;
 
+const GENERATE_GRIDTEX_FS_FLOAT = `\
+#ifdef GL_ES
+precision highp float;
+#endif
+
+void main(void) {
+  gl_FragColor = vec4(1., 0, 0, 1.0);
+}
+`;
+
 const RENDER_POINTS_VS = `\
 attribute vec2 positions;
 uniform vec2 windowSize;
@@ -107,11 +117,7 @@ attribute vec2 offsets;
 uniform vec2 windowSize;
 uniform vec2 gridSize;
 
-uniform sampler2D uSampler;
-
 varying vec2 vTextureCoord;
-varying vec4 vTextureColor;
-
 
 void main(void) {
   // Map each vertex from (0,0):windowSize -> (-1, -1):(1,1)
@@ -123,9 +129,6 @@ void main(void) {
 
   // Add 0.5 offset to coordinate (1/gridSize * 0.5)
   // vTextureCoord = vTextureCoord + (0.5 / gridSize);
-
-  vTextureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-
 }
 `;
 
@@ -135,7 +138,6 @@ precision highp float;
 #endif
 
 varying vec2 vTextureCoord;
-varying vec4 vTextureColor;
 uniform sampler2D uSampler;
 
 void main(void) {
@@ -147,6 +149,31 @@ void main(void) {
   //-hack- remove => tex coords are fine , range form (0,0) -> (1, 1)
   // gl_FragColor = vec4(vTextureCoord, 0.0, 1.0);
 
+}
+`;
+
+
+const RENDER_GRIDTEX_FS_FLOAT = `\
+#ifdef GL_ES
+precision highp float;
+#endif
+
+varying vec2 vTextureCoord;
+uniform sampler2D uSampler;
+
+void main(void) {
+  vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+  // gl_FragColor = vec4(1.0, 0, 0, 1.0);
+  // gl_FragColor = vec4(textureColor.rgb, 1.0);
+  if (textureColor.r > 2.*255.) {
+    gl_FragColor = vec4(1., 1., (textureColor.r - 2.*255.)/255.0, 1.0);
+  } else {
+    if (textureColor.r > 255.0) {
+      gl_FragColor = vec4(1., (textureColor.r - 255.)/255.0, 0., 1.0);
+    } else {
+      gl_FragColor = vec4(textureColor.r/255.0, 0., 0., 1.0);
+    }
+  }
 }
 `;
 
@@ -268,15 +295,14 @@ const animationLoop = new AnimationLoop({
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     console.log(`FB WXH: ${gridFramebuffer.texture.width} X ${gridFramebuffer.texture.height}`);
-    girdTexRenderModel.draw({
-      uniforms: {
-        uSampler: gridFramebuffer.texture
-//        texSize: [gridFramebuffer.texture.width, gridFramebuffer.texture.height]
-      },
-      parameters: {
-        blend: false
-      }
-    });
+    // girdTexRenderModel.draw({
+    //   uniforms: {
+    //     uSampler: gridFramebuffer.texture
+    //   },
+    //   parameters: {
+    //     blend: false
+    //   }
+    // });
     // squareTextureModel.draw({
     //   uniforms: {
     //     uSampler: gridFramebuffer.texture
@@ -314,7 +340,7 @@ const animationLoop = new AnimationLoop({
 });
 
 function buildModels(opts) {
-  const cellSize = [50, 50];
+  const cellSize = CELL_SIZE; //[50, 50];
   const {gl} = opts;
   const canvas = gl.canvas;
 
@@ -343,7 +369,7 @@ function buildModels(opts) {
   const numberOfGrids = 360;
   let gridCount = 0;
 
-  const borderOffset = 3;
+  const borderOffset = 0;
   for (let y = cellSize[1]*borderOffset; (y < windowSize[1] - cellSize[1]*borderOffset) & (gridCount < numberOfGrids); y += cellSize[1]) {
     for (let x = cellSize[0]*borderOffset; (x < windowSize[0]- cellSize[0]*borderOffset) & (gridCount < numberOfGrids); x += cellSize[0]) {
       pointsData.push({
@@ -354,7 +380,7 @@ function buildModels(opts) {
         count // : count%2 ? 1000 : 2
       });
       count += 1;
-      gridCount++;
+      // gridCount++;
     }
   }
   // pointsData.push({
@@ -494,7 +520,7 @@ function buildModels(opts) {
     id: 'Gird-Tex-Generation',
     // vs: VERTEX_SHADER_POINTS,
     vs: GENERATE_GRIDTEX_VS,
-    fs: GENERATE_GRIDTEX_FS,
+    fs: USE_FLOAT_TEXTURES ? GENERATE_GRIDTEX_FS_FLOAT : GENERATE_GRIDTEX_FS,
     attributes: {
       positions: pointPositions
     },
@@ -520,6 +546,7 @@ function buildModels(opts) {
     drawMode: GL.LINES
   });
 
+/*
   const girdAggregationTexModel = new Model(gl, {
     id: 'GridAggregationTexture-Model',
     vs: AGGREGATE_SUM_GRIDTEX_VS,
@@ -531,11 +558,11 @@ function buildModels(opts) {
     vertexCount: gridTexPixels.length / 2,
     drawMode: GL.POINTS
   });
-
+*/
   const girdTexRenderModel = new Model(gl, {
     id: 'GridTexture-Render- Model',
     vs: RENDER_GRIDTEX_VS,
-    fs: RENDER_GRIDTEX_FS,
+    fs: USE_FLOAT_TEXTURES ? RENDER_GRIDTEX_FS_FLOAT : RENDER_GRIDTEX_FS,
     attributes: {
       positions: gridPositions,
 //        texCoords: gridTexRectTexCoords,
@@ -601,7 +628,7 @@ function buildModels(opts) {
     girdTexGenerateModel,
     boundingRectModel,
     girdTexRenderModel,
-    girdAggregationTexModel,
+//    girdAggregationTexModel,
     pointsRenderModel,
     squareTextureModel,
     squareWindowSpaceTextureModel,
@@ -652,11 +679,20 @@ function generateGridTexture(gl, opts) {
 }
 
 function setupFramebuffer(gl, opts) {
+
+  let format = GL.RGBA;
+  let type = GL.UNSIGNED_BYTE;
+
+  if (USE_FLOAT_TEXTURES) {
+    format = GL.RGBA32F;
+    type = GL.FLOAT;
+  }
+
   const {gridSize, id} = opts;
   const rttTexture = new Texture2D(gl, {
     data: null,
-    format: GL.RGBA,
-    type: GL.UNSIGNED_BYTE,
+    format,
+    type,
     border: 0,
     mipmaps: false,
     parameters: {
