@@ -25,6 +25,7 @@ const GENERATE_GRIDTEX_VS = `\
 attribute vec2 positions;
 uniform vec2 windowSize;
 uniform vec2 cellSize;
+uniform vec2 gridSize;
 void main(void) {
 
   // -TODO- : some issue with this mapping
@@ -32,13 +33,13 @@ void main(void) {
 
   // Map each vertex from (0,0):windowSize -> (0, 0): texRect
   vec2 pos = floor(positions / cellSize);
-  vec2 texRect = floor(windowSize / cellSize); // TODO-1: this must be Integer division
+  // vec2 texRect = floor(windowSize / cellSize); // TODO-1: this must be Integer division
 
-  // Map each vertex from (0,0):texRect -> (-1, -1):(1,1)
-  pos = (pos * (2., 2.) / (texRect)) - (1., 1.);
+  // Map each vertex from (0,0):gridSize -> (-1, -1):(1,1)
+  pos = (pos * (2., 2.) / (gridSize)) - (1., 1.);
 
-  // Adding an offset of 0.5 pixel, in screen space 2/texRect * 0.5 => 1/texRect
-  vec2 offset = 1.0 / texRect;
+  // Adding an offset of 0.5 pixel, in screen space 2/gridSize * 0.5 => 1/gridSize
+  vec2 offset = 1.0 / gridSize;
   pos = pos + offset;
 
   gl_Position = vec4(pos, 1.0, 1.0);
@@ -49,12 +50,12 @@ void main(void) {
   // gl_Position = vec4(pos, 1.0, 1.0);
 
   // // -hack- remove this code
-  // // Map each vertex from (0,0):windowSize -> (0, 0): texRect
+  // // Map each vertex from (0,0):windowSize -> (0, 0): gridSize
   // vec2 pos = floor(positions / cellSize);
-  // vec2 texRect = floor(windowSize / cellSize); // TODO-1: this must be Integer division
+  // vec2 gridSize = floor(windowSize / cellSize); // TODO-1: this must be Integer division
   //
-  // // Map each vertex from (0,0):texRect -> (-1, -1):(0,0) => this show grid of points
-  // pos = (pos / (texRect)) - (1., 1.);
+  // // Map each vertex from (0,0):gridSize -> (-1, -1):(0,0) => this show grid of points
+  // pos = (pos / (gridSize)) - (1., 1.);
   // gl_Position = vec4(pos, 1.0, 1.0);
 
 }
@@ -104,7 +105,7 @@ attribute vec2 positions;
 attribute vec2 offsets;
 // attribute vec2 texCoords;
 uniform vec2 windowSize;
-uniform vec2 texSize;
+uniform vec2 gridSize;
 
 uniform sampler2D uSampler;
 
@@ -120,8 +121,8 @@ void main(void) {
   // Position is in (-1, -1) to (1, 1) => texCord (0, 0) -> (1, 1)
   vTextureCoord = (positions + offsets) / windowSize;
 
-  // Add 0.5 offset to coordinate (1/texSize * 0.5)
-  // vTextureCoord = vTextureCoord + (0.5 / texSize);
+  // Add 0.5 offset to coordinate (1/gridSize * 0.5)
+  // vTextureCoord = vTextureCoord + (0.5 / gridSize);
 
   vTextureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
 
@@ -247,7 +248,7 @@ const animationLoop = new AnimationLoop({
 //      blendColor: [1.0, 1.0, 1.0, 1.0],
     });
 
-    return buildModels({gl});
+    // return buildModels({gl});
   },
   onRender(context) {
     const gl = context.gl;
@@ -255,8 +256,7 @@ const animationLoop = new AnimationLoop({
       girdTexGenerateModel, boundingRectModel, girdTexRenderModel,
       gridSize, girdAggregationTexModel, pointsRenderModel,
       squareTextureModel, squareWindowSpaceTextureModel
-    } = context;
-
+    } = buildModels({gl});
 
     generateGridTexture(gl, {
       gridSize,
@@ -267,23 +267,24 @@ const animationLoop = new AnimationLoop({
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // girdTexRenderModel.draw({
-    //   uniforms: {
-    //     uSampler: gridFramebuffer.texture,
-    //     texSize: [gridFramebuffer.texture.width, gridFramebuffer.texture.height]
-    //   },
-    //   parameters: {
-    //     blend: false
-    //   }
-    // });
-    squareTextureModel.draw({
+    console.log(`FB WXH: ${gridFramebuffer.texture.width} X ${gridFramebuffer.texture.height}`);
+    girdTexRenderModel.draw({
       uniforms: {
         uSampler: gridFramebuffer.texture
+//        texSize: [gridFramebuffer.texture.width, gridFramebuffer.texture.height]
       },
       parameters: {
         blend: false
       }
     });
+    // squareTextureModel.draw({
+    //   uniforms: {
+    //     uSampler: gridFramebuffer.texture
+    //   },
+    //   parameters: {
+    //     blend: false
+    //   }
+    // });
     // squareWindowSpaceTextureModel.draw({
     //   uniforms: {
     //     uSampler: gridFramebuffer.texture
@@ -319,13 +320,21 @@ function buildModels(opts) {
 
   const windowSize = [canvas.width, canvas.height];
   const gridSize = [
-    Math.floor(windowSize[0] / cellSize[0]),
-    Math.floor(windowSize[1] / cellSize[1])
+    Math.ceil(windowSize[0] / cellSize[0]),
+    Math.ceil(windowSize[1] / cellSize[1])
   ];
+
+  // Update windowSize
+  windowSize[0] = gridSize[0] * cellSize[0];
+  windowSize[1] = gridSize[1] * cellSize[1];
 
   console.log(`Window ${windowSize[0]}X${windowSize[1]}`);
   console.log(`Cell ${cellSize[0]}X${cellSize[1]}`);
   console.log(`Grid ${gridSize[0]}X${gridSize[1]}`);
+  // TODO: the problem seem to be when windowSize is not evenly devided by cellSize
+  // when we take ceil, lets say window: 19, cell : 5, tex => 4 (3.8)
+  // now we are mapping 0->17 (size 19) to 0->3 (size 4) which doesn't map to single pixels.
+  // For internal calulcation purposes, update window = cell * grid
 
   const xMargin = 1;
   const yMargin = 1;
@@ -334,7 +343,7 @@ function buildModels(opts) {
   const numberOfGrids = 360;
   let gridCount = 0;
 
-  const borderOffset = 0;
+  const borderOffset = 3;
   for (let y = cellSize[1]*borderOffset; (y < windowSize[1] - cellSize[1]*borderOffset) & (gridCount < numberOfGrids); y += cellSize[1]) {
     for (let x = cellSize[0]*borderOffset; (x < windowSize[0]- cellSize[0]*borderOffset) & (gridCount < numberOfGrids); x += cellSize[0]) {
       pointsData.push({
@@ -342,7 +351,7 @@ function buildModels(opts) {
         y: y + yMargin,
         width: cellSize[0] - 2 * xMargin,
         height: cellSize[1] - 2 * yMargin,
-        count
+        count // : count%2 ? 1000 : 2
       });
       count += 1;
       gridCount++;
@@ -491,7 +500,8 @@ function buildModels(opts) {
     },
     uniforms: {
       windowSize,
-      cellSize
+      cellSize,
+      gridSize
     },
     vertexCount: pointCount,
     drawMode: GL.POINTS
@@ -533,7 +543,8 @@ function buildModels(opts) {
     },
     uniforms: {
       windowSize,
-      cellSize
+      cellSize,
+      gridSize
     },
     isInstanced: 1,
     instanceCount: gridOffsetsData.length / 2,
