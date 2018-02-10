@@ -83,6 +83,36 @@ void main(void) {
 }
 `;
 
+// RENDER each pixel in Grid as vertex, sample the value for gridTex
+// positions are in [-1, 1] range
+// Setup blending to sum values of RGB and Max value for A
+const AGGREGATE_SUM_GRIDTEX_VS = `\
+attribute vec2 positions;
+attribute vec2 texCoords;
+varying vec2 vTextureCoord;
+void main(void) {
+  // Map each position to single pixel
+   gl_Position = vec4(-1.0, -1.0, 1.0, 1.0);
+
+  vTextureCoord = texCoords;
+}
+`;
+
+const AGGREGATE_SUM_GRIDTEX_FS = `\
+#ifdef GL_ES
+precision highp float;
+#endif
+
+varying vec2 vTextureCoord;
+uniform sampler2D uSampler;
+
+void main(void) {
+  vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+  gl_FragColor = vec4(textureColor.rgb, textureColor.r);
+}
+`;
+
+
 const RENDER_POINTS_VS = `\
 attribute vec2 positions;
 uniform vec2 windowSize;
@@ -174,36 +204,6 @@ void main(void) {
       gl_FragColor = vec4(textureColor.r/255.0, 0., 0., 1.0);
     }
   }
-}
-`;
-
-// RENDER each pixel in Grid as vertex, sample the value for gridTex
-// Setup blending to sum values of RGB and Max value for A
-const AGGREGATE_SUM_GRIDTEX_VS = `\
-attribute vec2 positions;
-attribute vec2 texCoords;
-varying vec2 vTextureCoord;
-void main(void) {
-  // Position is in screen space
-   gl_Position = vec4(-1.0, -1.0, 1.0, 1.0);
-  //gl_Position = vec4(positions.rg, 1.0, 1.0); //-hack
-
-  vTextureCoord = texCoords;
-}
-`;
-
-const AGGREGATE_SUM_GRIDTEX_FS = `\
-#ifdef GL_ES
-precision highp float;
-#endif
-
-varying vec2 vTextureCoord;
-uniform sampler2D uSampler;
-
-void main(void) {
-  vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-  // gl_FragColor = vec4(1.0, 0, 0, 1.0);
-  gl_FragColor = vec4(textureColor.rgb, textureColor.r);
 }
 `;
 
@@ -320,20 +320,20 @@ const animationLoop = new AnimationLoop({
     //   }
     // });
 
-    // generateGridAggregationTexture(gl, {
-    //   gridSize,
-    //   girdAggregationTexModel
-    // });
+    generateGridAggregationTexture(gl, {
+      gridSize,
+      girdAggregationTexModel
+    });
     //
     // girdTexRenderModel.render({
     //   uSampler: girdAggregrationFramebuffer.texture
     // });
 
-    pointsRenderModel.draw({
-      parameters: {
-        blend: false
-      }
-    });
+    // pointsRenderModel.draw({
+    //   parameters: {
+    //     blend: false
+    //   }
+    // });
 
     this.stop();
     return false;
@@ -365,25 +365,35 @@ function buildModels(opts) {
 
   const xMargin = 1;
   const yMargin = 1;
-  let count = 1;
+  let count = 0;
   const pointsData = [];
   const numberOfGrids = 360;
   let gridCount = 0;
+  let maxCount = -1;
+  let totalCount = 0;
 
   const borderOffset = 0;
   for (let y = cellSize[1]*borderOffset; (y < windowSize[1] - cellSize[1]*borderOffset) & (gridCount < numberOfGrids); y += cellSize[1]) {
     for (let x = cellSize[0]*borderOffset; (x < windowSize[0]- cellSize[0]*borderOffset) & (gridCount < numberOfGrids); x += cellSize[0]) {
+      // count++;
+      count =  Math.floor(Math.random() * 255 * 3)
+      totalCount += count;
+      if (count > maxCount) {
+        maxCount = count;
+      }
       pointsData.push({
         x: x + xMargin,
         y: y + yMargin,
         width: cellSize[0] - 2 * xMargin,
         height: cellSize[1] - 2 * yMargin,
-        count: Math.floor(Math.random() * 255 * 3)
+        count
       });
       count += 1;
       // gridCount++;
     }
   }
+
+  console.log(`pointsData totalCount: ${totalCount} maxCount: ${maxCount}`);
   // pointsData.push({
   //   x: 0,
   //   y: 0,
@@ -547,7 +557,6 @@ function buildModels(opts) {
     drawMode: GL.LINES
   });
 
-/*
   const girdAggregationTexModel = new Model(gl, {
     id: 'GridAggregationTexture-Model',
     vs: AGGREGATE_SUM_GRIDTEX_VS,
@@ -559,7 +568,7 @@ function buildModels(opts) {
     vertexCount: gridTexPixels.length / 2,
     drawMode: GL.POINTS
   });
-*/
+
   const girdTexRenderModel = new Model(gl, {
     id: 'GridTexture-Render- Model',
     vs: RENDER_GRIDTEX_VS,
@@ -629,7 +638,7 @@ function buildModels(opts) {
     girdTexGenerateModel,
     boundingRectModel,
     girdTexRenderModel,
-//    girdAggregationTexModel,
+    girdAggregationTexModel,
     pointsRenderModel,
     squareTextureModel,
     squareWindowSpaceTextureModel,
@@ -639,7 +648,7 @@ function buildModels(opts) {
 }
 
 function generateGridAggregationTexture(gl, opts) {
-  const {gridSize, girdAggregationTexModel} = opts;
+  const {girdAggregationTexModel} = opts;
 
   girdAggregationTexModel.draw({
     framebuffer: girdAggregrationFramebuffer,
@@ -653,6 +662,15 @@ function generateGridAggregationTexture(gl, opts) {
       uSampler: gridFramebuffer.texture
     }
   });
+
+  const pixel = girdAggregrationFramebuffer.readPixels({
+    width: 1,
+    height: 1,
+    format: GL.RGBA,
+    type: GL.FLOAT
+  });
+
+  console.log(`r: ${pixel[0]} g: ${pixel[1]} b: ${pixel[2]} a: ${pixel[3]}`);
 
 }
 
