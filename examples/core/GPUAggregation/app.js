@@ -295,14 +295,14 @@ const animationLoop = new AnimationLoop({
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     console.log(`FB WXH: ${gridFramebuffer.texture.width} X ${gridFramebuffer.texture.height}`);
-    // girdTexRenderModel.draw({
-    //   uniforms: {
-    //     uSampler: gridFramebuffer.texture
-    //   },
-    //   parameters: {
-    //     blend: false
-    //   }
-    // });
+    girdTexRenderModel.draw({
+      uniforms: {
+        uSampler: gridFramebuffer.texture
+      },
+      parameters: {
+        blend: false
+      }
+    });
     // squareTextureModel.draw({
     //   uniforms: {
     //     uSampler: gridFramebuffer.texture
@@ -335,6 +335,7 @@ const animationLoop = new AnimationLoop({
       }
     });
 
+    this.stop();
     return false;
   }
 });
@@ -377,7 +378,7 @@ function buildModels(opts) {
         y: y + yMargin,
         width: cellSize[0] - 2 * xMargin,
         height: cellSize[1] - 2 * yMargin,
-        count // : count%2 ? 1000 : 2
+        count: Math.floor(Math.random() * 255 * 3)
       });
       count += 1;
       // gridCount++;
