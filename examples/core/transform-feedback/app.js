@@ -111,6 +111,12 @@ const animationLoop = new AnimationLoop({
 
     const renderProgram = new Program(gl, {vs: VS_FEEDBACK, fs: FS_FEEDBACK});
 
+    // second pass, render to screen
+    setParameters(gl, {
+      clearColor: [0.0, 0.0, 0.0, 1.0]
+    });
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
     transformProgram.draw({
       drawMode: gl.TRIANGLES,
       vertexCount: VERTEX_COUNT,
@@ -120,7 +126,7 @@ const animationLoop = new AnimationLoop({
         MVP: new Matrix4().identity()
       },
       parameters: {
-        [gl.RASTERIZER_DISCARD]: true
+  //      [gl.RASTERIZER_DISCARD]: true
       }
     });
 
@@ -138,8 +144,8 @@ const animationLoop = new AnimationLoop({
     });
 
     renderProgram.draw({
-      drawMode: gl.TRIANGLE_FAN,
-      vertexCount: VERTEX_COUNT,
+      drawMode: gl.LINES,
+      vertexCount: VERTEX_COUNT - 3,
       vertexArray: renderVertexArray
     });
 
