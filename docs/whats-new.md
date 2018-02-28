@@ -1,8 +1,21 @@
 # What's New
 
+## Version 5.1
+
+## TransformFeedback Enhancements
+
+Performing Transform Feedback operations has gotten easier, mainly in the following two ways:
+
+`TransformFeedback` instances can now be supplied directly to `Model.draw` and feedback will begin and end during that draw call. Thus it is no longer necessary to work directly with the `Program` class to use transform feedback.
+
+`Program` now build a `varyingMap` on creation depending on `varyings` array and `drawMode`. This `varyingMap` can be passed to `TransformFeedback.bindBuffers()` enabling buffers to be indexed by the name of the "varying" instead of using an index.
+
+For more details check [`TransformFeedback`](/#/documentation/api-reference/transform-feedback) and [`Model`](/#/documentation/api-reference/model) documentation.
+
+
 ## Version 5.0
 
-A smaller release with new `picking` shader module, several new examples and some under the hood changes to improve performance, bug fixes and code cleanup.
+A smaller release with several new examples and some under the hood changes to improve performance, bug fixes and code cleanup.
 
 ### Picking shader module
 
@@ -12,11 +25,35 @@ A smaller release with new `picking` shader module, several new examples and som
 
 In v4 we added WebGL state management which automatically tracks all WebGL state settings. In this release we extended this feature to support framebuffer bindings.
 
+
 ### Model
 
-`Model.draw` now supports `moduleSettings` parameters to update shader module settings.
+`Model.draw` now supports a `moduleSettings` parameters to update shader module settings.
 
 `Model.render` now supports `attributes` and `samplers` arguments to be used for drawing.
+
+
+### Shader Modules
+
+* `fp64` - fp64 module works under more platforms/GPUs/drivers
+* `picking` - new module from deck.gl
+
+
+### State Management
+
+WebGL state management now also tracks framebuffer bindings in addition to other parameters.
+
+
+### WebGL2 Improvements
+
+Improvements in particular to the `Buffer`, `TransformFeedback` and `Framebuffer` classes based on use in applications.
+
+
+### Examples
+
+Some additional examples have been ported to the luma.gl v4 API.
+
+* lesson 10-13
 
 ## Version 4.0
 
@@ -32,6 +69,7 @@ luma.gl now exposes the complete WebGL2 APIs
 * Other existing WebGL classes with new functionalites under WebGL2 have been updated.
 * Add new WebGL2 texture formats and types support, including floating point textures, and multiple render targets.
 
+
 ### WebGL Capability Management
 
 luma.gl provides a single unified WebGL2-style API across WebGL2, WebGL1 and WebGL extensions, and provides a simple mechanisms for querying what capabilities are available. This simplifies building apps that run on both WebGL1 and WebGL2, seamlessly allowing applications to leverage WebGL extensions when available.
@@ -40,10 +78,9 @@ luma.gl provides a single unified WebGL2-style API across WebGL2, WebGL1 and Web
 ### WebGL State Management
 
 In this version, a new WebGL state management is implemented to help address one of the weak spots of the state-machine based WebGL API
-
 * luma.gl can track certain WebGL context state changes so the app could easily set and reset WebGL states for certain operations.
-
 * luma.gl also has a host-side WebGL state caching system that records certain WebGL states so that expansive queries into the GPU or underlying OpenGL driver won't be necessary.
+
 
 ### shadertools - A New Shader Module System
 

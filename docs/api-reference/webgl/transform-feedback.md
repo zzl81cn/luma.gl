@@ -13,32 +13,42 @@ For more information, see [OpenGL Wiki](https://www.khronos.org/opengl/wiki/Tran
 
 ## Usage
 
-Setting up a program for transform feedback.
+Setting up a model object for transform feedback.
 ```js
-const program = new Program(gl, {
+const model = new Model(gl, {
   vs,
   fs,
-  varyings: ['gl_Position'],
-});
-
-Setting up a transform feedback object and binding buffers
-```js
-const program = new Program(gl, {
-  vs,
-  fs,
-  varyings: ['gl_Position'],
+  varyings: ['gl_Position', 'outputColor'],
+  ...
 });
 ```
+
+Setting up a transform feedback object and binding buffers
 
 ```js
 const transformFeedback = new TransformFeedback(gl)
-  .bindBuffer({index: 0, buffer, })
-  .bindBuffer({index: 1, buffer, });
+  .bindBuffer({index: 0, bufferPosition, })
+  .bindBuffer({index: 1, bufferColor, });
 ```
+
+When binding the buffers, index should be equal to the corresponding varying entry in `varyings` array passed to `Program` constructor.
+
+Buffers can also be bound using varying name and varyingMap that can be retrieved from `Model` object.
+
+```js
+const transformFeedback = new TransformFeedback(gl, {
+  buffers: {
+    outputColor: bufferColor,
+    gl_Position: bufferPosition
+  },
+  varyingMap: model.varyingMap
+});
+```
+
 
 Running program (drawing) with implicit activation of transform feedback (will call `begin` and `end` on supplied `transformFeedback`)
 ```js
-program.draw({
+model.draw({
   drawMode,
   vertexCount,
   ...,
@@ -48,17 +58,15 @@ program.draw({
 
 Running program (drawing) with explicit activation of transform feedback
 ```js
-program.use();
 transformFeedback.begin();
-program.draw({...});
+model.draw({...});
 transformFeedback.end();
 ```
 
 Turning off rasterization
 ```js
-withSettings({[GL.RASTERIZER_DISCARD]: true]}, () => {
-  program.draw({..., transformFeedback});
-});
+const parameters = {[GL.RASTERIZER_DISCARD]: true}
+model.draw({..., transformFeedback, parameters});
 ```
 
 
@@ -66,8 +74,10 @@ withSettings({[GL.RASTERIZER_DISCARD]: true]}, () => {
 
 ### constructor
 
-* `gl` (`WebGL2RenderingContext`) gl - context
-* `opts` (`Object`=`{}`) - options
+* `gl` - (`WebGL2RenderingContext`) gl - context
+* `opts` - (`Object`={}) - options
+  * `buffers` - buffers that gets bound to `TRANSFORM_FEEDBACK_BUFFER` target for recording vertex shader outputs.
+  * `varyingMap` - Object mapping varying name to buffer index it needs to be bound.
 
 WebGL APIs [`gl.createTransformFeedback`](https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/createTransformFeedback)
 
@@ -78,7 +88,6 @@ WebGL APIS [`gl.deleteTransformFeedback`](https://developer.mozilla.org/en-US/do
 ### bindBuffer
 
 WebGL APIs [`gl.bindBufferBase`](https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/bindBufferBase), [`gl.bindBufferRange`](https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/bindBufferRange)
-
 
 ### begin(primitiveMode)
 
