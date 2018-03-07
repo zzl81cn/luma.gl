@@ -7,8 +7,10 @@
 
 import {
   AnimationLoop, Buffer, TransformFeedback, VertexArray,
-  setParameters, Model
+  setParameters, Model, GL, loadTextures,
+  Geometry
 } from 'luma.gl';
+import Star from './star'
 
 const OFFSET_LOCATION = 0;
 const ROTATION_LOCATION = 1;
@@ -22,6 +24,8 @@ const EMIT_VS = `\
 #define ROTATION_LOCATION 1
 
 #define M_2PI 6.28318530718
+#define PI_N 0.0031415926535
+#define RADIUS 0.8
 
 // We simulate the wandering of agents using transform feedback in this vertex shader
 // The simulation goes like this:
@@ -36,7 +40,7 @@ const EMIT_VS = `\
 #define MAP_HALF_LENGTH 1.01
 #define WANDER_CIRCLE_R 0.01
 #define WANDER_CIRCLE_OFFSET 0.04
-#define MOVE_DELTA 0.001
+#define MOVE_DELTA 0.01
 precision highp float;
 precision highp int;
 uniform float u_time;
@@ -52,18 +56,12 @@ float rand(vec2 co)
 
 void main()
 {
-    float theta = M_2PI * rand(vec2(u_time, a_rotation + a_offset.x + a_offset.y));
     float cos_r = cos(a_rotation);
     float sin_r = sin(a_rotation);
-    mat2 rot = mat2(
-        cos_r, sin_r,
-        -sin_r, cos_r
-    );
 
-    vec2 p = WANDER_CIRCLE_R * vec2(cos(theta), sin(theta)) + vec2(WANDER_CIRCLE_OFFSET, 0.0);
-    vec2 move = normalize(rot * p);
-    v_rotation = atan(move.y, move.x);
-    v_offset = a_offset + MOVE_DELTA * move;
+    v_rotation = a_rotation + PI_N; 
+    vec2 offset = vec2(cos(v_rotation), sin(v_rotation)) * RADIUS; 
+    v_offset = offset;
 
     // wrapping at edges
     v_offset = vec2 (
@@ -99,6 +97,10 @@ layout(location = ROTATION_LOCATION) in float a_rotation;
 layout(location = OFFSET_LOCATION) in vec2 a_offset;
 layout(location = COLOR_LOCATION) in vec3 a_color;
 out vec3 v_color;
+
+attribute vec2 texCoords;
+varying vec2 vTextureCoord;
+
 void main()
 {
     v_color = a_color;
@@ -110,6 +112,7 @@ void main()
         -sin_r, cos_r
     );
     gl_Position = vec4(rot * a_position + a_offset, 0.0, 1.0);
+    vTextureCoord = texCoords;
 }
 `;
 
@@ -118,11 +121,13 @@ const DRAW_FS = `\
 #define ALPHA 0.9
 precision highp float;
 precision highp int;
-in vec3 v_color;
-out vec4 color;
+
+varying vec2 vTextureCoord;
+uniform sampler2D uSampler;
+
 void main()
 {
-    color = vec4(v_color * ALPHA, ALPHA);
+  gl_FragColor = texture2D(uSampler, vec2(1, 1));
 }
 `;
 
@@ -133,137 +138,155 @@ const animationLoop = new AnimationLoop({
   glOptions: {webgl2: true},
   /* eslint-disable max-statements */
   onInitialize({canvas, gl}) {
+    return loadTextures(gl, {
+      urls: ['car-top-view.png']
+    }).then(textures => {
+      const modelRender = new Model(gl, {
+        id: 'Model-Render',
+        vs: DRAW_VS,
+        fs: DRAW_FS,
+        geometry: new Geometry({
+          drawMode: GL.TRIANGLE_STRIP,
+          attributes: {
+            positions: new Float32Array([1, 1, 0, -1, 1, 0, 1, -1, 0, -1, -1, 0]),
+            texCoords: new Float32Array([
+              1.0, 1.0,
+              0.0, 1.0,
+              1.0, 0.0,
+              0.0, 0.0
+            ])
+          }
+        }),
+        uniforms: {
+          uSampler: textures[0]
+        },
+        drawMode: gl.TRIANGLE_FAN,
+        vertexCount: 3,
+        isInstanced: true,
+        instanceCount: NUM_INSTANCES
+      });
 
-    const modelRender = new Model(gl, {
-      id: 'Model-Render',
-      vs: DRAW_VS,
-      fs: DRAW_FS,
-      drawMode: gl.TRIANGLE_FAN,
-      vertexCount: 3,
-      isInstanced: true,
-      instanceCount: NUM_INSTANCES
-    });
+      const modelTransform = new Model(gl, {
+        id: 'Model-Transform',
+        vs: EMIT_VS,
+        fs: EMIT_FS,
+        varyings: EMIT_VARYINGS,
+        drawMode: gl.POINTS,
+        vertexCount: NUM_INSTANCES,
+        isInstanced: false
+      });
 
-    const modelTransform = new Model(gl, {
-      id: 'Model-Transform',
-      vs: EMIT_VS,
-      fs: EMIT_FS,
-      varyings: EMIT_VARYINGS,
-      drawMode: gl.POINTS,
-      vertexCount: NUM_INSTANCES,
-      isInstanced: false
-    });
+      // -- Initialize data
+      const trianglePositions = new Float32Array([
+        0.015, 0.0,
+        -0.010, 0.010,
+        -0.010, -0.010
+      ]);
 
-    // -- Initialize data
-    const trianglePositions = new Float32Array([
-      0.015, 0.0,
-      -0.010, 0.010,
-      -0.010, -0.010
-    ]);
+      const instanceOffsets = new Float32Array(NUM_INSTANCES * 2);
+      const instanceRotations = new Float32Array(NUM_INSTANCES);
+      const instanceColors = new Float32Array(NUM_INSTANCES * 3);
 
-    const instanceOffsets = new Float32Array(NUM_INSTANCES * 2);
-    const instanceRotations = new Float32Array(NUM_INSTANCES);
-    const instanceColors = new Float32Array(NUM_INSTANCES * 3);
+      for (let i = 0; i < NUM_INSTANCES; ++i) {
+        instanceOffsets[i * 2] = Math.random() * 2.0 - 1.0;
+        instanceOffsets[i * 2 + 1] = Math.random() * 2.0 - 1.0;
 
-    for (let i = 0; i < NUM_INSTANCES; ++i) {
-      instanceOffsets[i * 2] = Math.random() * 2.0 - 1.0;
-      instanceOffsets[i * 2 + 1] = Math.random() * 2.0 - 1.0;
+        instanceRotations[i] = Math.random() * 2 * Math.PI;
 
-      instanceRotations[i] = Math.random() * 2 * Math.PI;
+        instanceColors[i * 3] = Math.random();
+        instanceColors[i * 3 + 1] = Math.random();
+        instanceColors[i * 3 + 2] = Math.random();
+      }
 
-      instanceColors[i * 3] = Math.random();
-      instanceColors[i * 3 + 1] = Math.random();
-      instanceColors[i * 3 + 2] = Math.random();
-    }
+      // -- Init VertexArrays and TransformFeedback objects
 
-    // -- Init VertexArrays and TransformFeedback objects
+      const vertexArrays = new Array(2);
+      const transformVertexArrays = new Array(2);
+      const transformFeedbacks = new Array(2);
 
-    const vertexArrays = new Array(2);
-    const transformVertexArrays = new Array(2);
-    const transformFeedbacks = new Array(2);
-
-    const positionBuffer = new Buffer(gl, {
-      data: trianglePositions,
-      size: 2,
-      type: gl.FLOAT
-    });
-    const colorBuffer = new Buffer(gl, {
-      data: instanceColors,
-      size: 3,
-      type: gl.FLOAT
-    });
-
-    for (let va = 0; va < vertexArrays.length; ++va) {
-      const offsetBuffer = new Buffer(gl, {
-        data: instanceOffsets,
+      const positionBuffer = new Buffer(gl, {
+        data: trianglePositions,
         size: 2,
         type: gl.FLOAT
       });
-
-      const rotationBuffer = new Buffer(gl, {
-        data: instanceRotations,
-        size: 1,
+      const colorBuffer = new Buffer(gl, {
+        data: instanceColors,
+        size: 3,
         type: gl.FLOAT
       });
 
-      vertexArrays[va] = new VertexArray(gl, {
-        buffers: {
-          [COLOR_LOCATION]: {
-            buffer: colorBuffer,
-            instanced: 1
-          },
-          [OFFSET_LOCATION]: {
-            buffer: offsetBuffer,
-            instanced: 1
-          },
-          [ROTATION_LOCATION]: {
-            buffer: rotationBuffer,
-            instanced: 1
-          },
-          [POSITION_LOCATION]: {
-            buffer: positionBuffer,
-            instanced: 0
+      for (let va = 0; va < vertexArrays.length; ++va) {
+        const offsetBuffer = new Buffer(gl, {
+          data: instanceOffsets,
+          size: 2,
+          type: gl.FLOAT
+        });
+
+        const rotationBuffer = new Buffer(gl, {
+          data: instanceRotations,
+          size: 1,
+          type: gl.FLOAT
+        });
+
+        vertexArrays[va] = new VertexArray(gl, {
+          buffers: {
+            [COLOR_LOCATION]: {
+              buffer: colorBuffer,
+              instanced: 1
+            },
+            [OFFSET_LOCATION]: {
+              buffer: offsetBuffer,
+              instanced: 1
+            },
+            [ROTATION_LOCATION]: {
+              buffer: rotationBuffer,
+              instanced: 1
+            },
+            [POSITION_LOCATION]: {
+              buffer: positionBuffer,
+              instanced: 0
+            }
           }
-        }
-      });
+        });
 
-      transformVertexArrays[va] = new VertexArray(gl, {
-        buffers: {
-          [OFFSET_LOCATION]: {
-            buffer: offsetBuffer,
-            instanced: 0
-          },
-          [ROTATION_LOCATION]: {
-            buffer: rotationBuffer,
-            instanced: 0
+        transformVertexArrays[va] = new VertexArray(gl, {
+          buffers: {
+            [OFFSET_LOCATION]: {
+              buffer: offsetBuffer,
+              instanced: 0
+            },
+            [ROTATION_LOCATION]: {
+              buffer: rotationBuffer,
+              instanced: 0
+            }
           }
-        }
+        });
+
+        /* eslint-disable camelcase  */
+        transformFeedbacks[va] = new TransformFeedback(gl, {
+          buffers: {
+            v_rotation: rotationBuffer,
+            v_offset: offsetBuffer
+          },
+          varyingMap: modelTransform.varyingMap
+        });
+        /* eslint-enable camelcase  */
+      }
+
+      setParameters(gl, {
+        clearColor: [0.0, 0.0, 0.0, 1.0],
+        blend: true,
+        blendFunc: [gl.SRC_ALPHA, gl.ONE]
       });
 
-      /* eslint-disable camelcase  */
-      transformFeedbacks[va] = new TransformFeedback(gl, {
-        buffers: {
-          v_rotation: rotationBuffer,
-          v_offset: offsetBuffer
-        },
-        varyingMap: modelTransform.varyingMap
-      });
-      /* eslint-enable camelcase  */
-    }
-
-    setParameters(gl, {
-      clearColor: [0.0, 0.0, 0.0, 1.0],
-      blend: true,
-      blendFunc: [gl.SRC_ALPHA, gl.ONE]
-    });
-
-    return {
-      vertexArrays,
-      transformVertexArrays,
-      transformFeedbacks,
-      modelRender,
-      modelTransform
-    };
+      return {
+        vertexArrays,
+        transformVertexArrays,
+        transformFeedbacks,
+        modelRender,
+        modelTransform
+      };
+    })
   },
   /* eslint-enable max-statements */
 
