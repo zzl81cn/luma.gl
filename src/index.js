@@ -38,8 +38,6 @@ export {
   getFeatures} from './webgl/context-features';
 export {
   makeDebugContext} from './webgl/context-debug';
-export {
-  installParameterDefinitions} from './webgl/api/debug-parameters';
 
 export {default as Buffer} from './webgl/buffer';
 export {Shader, VertexShader, FragmentShader} from './webgl/shader';
